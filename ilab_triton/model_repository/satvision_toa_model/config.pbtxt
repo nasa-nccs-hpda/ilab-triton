@@ -1,4 +1,4 @@
-name: "identity_demo_model"
+name: "satvision_toa_model"
 platform: "pytorch_libtorch"
 max_batch_size: 0
 input [

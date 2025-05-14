@@ -6,7 +6,7 @@ import tritonclient.http as httpclient
 client = httpclient.InferenceServerClient(url="localhost:8000")
 
 # Create dummy input
-input_data = np.random.randn(1, 3, 224, 224).astype(np.float32)
+input_data = np.random.randn(3, 224, 224).astype(np.float32)
 
 # Set up input and output
 input_tensor = httpclient.InferInput("INPUT__0", input_data.shape, "FP32")
@@ -17,7 +17,7 @@ output_tensor = httpclient.InferRequestedOutput("OUTPUT__0")
 
 # Run inference
 response = client.infer(
-    model_name="identity",
+    model_name="identity_demo_model",
     inputs=[input_tensor],
     outputs=[output_tensor]
 )
