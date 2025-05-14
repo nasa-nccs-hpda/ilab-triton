@@ -2,6 +2,7 @@ import os
 import sys
 import torch
 import subprocess
+import numpy as np
 import urllib.request
 
 # ------------------------------------------------------------------------------------
@@ -83,7 +84,7 @@ model.eval()
 transform = MimTransform(config)
 
 # dummy input
-image = torch.randn(128, 128, 14)
+image = np.random.rand(128, 128, 14)
 image, mask = transform(image)
 image = image.unsqueeze(0).cuda(non_blocking=True)
 mask = torch.from_numpy(mask).unsqueeze(0).cuda(non_blocking=True)
