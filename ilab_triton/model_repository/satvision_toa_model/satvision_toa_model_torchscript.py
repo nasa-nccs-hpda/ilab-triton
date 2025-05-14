@@ -106,7 +106,5 @@ print(f"Reconstruction output: {img_recon.shape}")
 #traced = torch.jit.trace(model, (image, mask))
 #traced.save(os.path.join(output_dir, "model.pt"))
 
-import torch._dynamo
-
-if torch._dynamo.is_compiled(model):
-    print("Model is compiled. Cannot trace.")
+scripted = torch.jit.script(model)
+scripted.save(os.path.join(output_dir, "model.pt"))
