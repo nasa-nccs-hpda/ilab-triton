@@ -5,12 +5,12 @@ input [
   {
     name: "image"
     data_type: TYPE_FP32
-    dims: [14, 128, 128]
+    dims: [1, 14, 128, 128]
   },
   {
     name: "mask"
     data_type: TYPE_BOOL
-    dims: [32, 32]
+    dims: [1, 32, 32]
   }
 ]
 output [
