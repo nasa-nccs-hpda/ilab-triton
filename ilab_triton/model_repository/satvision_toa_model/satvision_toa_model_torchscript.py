@@ -74,6 +74,20 @@ model.load_state_dict(checkpoint['module'])
 print('Successfully applied checkpoint')
 model.eval()
 
+# ------------------------------------------------------------------------------------
 # 3. Quick test with dummy input
-# 4. Save the new model
+# ------------------------------------------------------------------------------------
 
+# test with a dummy input
+x = torch.randn(1, 14, 128, 128)  # match the model’s input shape
+with torch.no_grad():
+    out = model(x)
+    print(out.shape)
+
+# ------------------------------------------------------------------------------------
+# # 4. Save the new model
+# ------------------------------------------------------------------------------------
+
+# convert to torchscript
+traced = torch.jit.trace(model, x)
+traced.save(os.path.join(output_dir, "model.pt"))
