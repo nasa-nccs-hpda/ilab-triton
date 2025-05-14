@@ -7,7 +7,7 @@ ILAB Triton Server Configuration and Benchmarks
 ```bash
 docker run --rm --gpus all \
   -p8000:8000 -p8001:8001 -p8002:8002 \
-  -v $(pwd)/model_repository:/models \
+  -v /raid/ilab/ilab-triton/ilab_triton/model_repository:/models \
   nvcr.io/nvidia/tritonserver:25.04-py3 \
   tritonserver --model-repository=/models
 ```
