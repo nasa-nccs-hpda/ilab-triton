@@ -102,17 +102,18 @@ print(f"Reconstruction output: {img_recon.shape}")
 # # 4. Save the new model
 # ------------------------------------------------------------------------------------
 
-if hasattr(model, "_orig_mod"):
-    model = model._orig_mod
-if hasattr(model, "module"):
-    model = model.module
+print(type(model))
+#if hasattr(model, "_orig_mod"):
+#    model = model._orig_mod
+#if hasattr(model, "module"):
+#    model = model.module
 
 # convert to torchscript
 #traced = torch.jit.trace(model, (image, mask))
 #traced.save(os.path.join(output_dir, "model.pt"))
 
-scripted = torch.jit.script(model)
-scripted.save(os.path.join(output_dir, "model.pt"))
+#scripted = torch.jit.script(model)
+#scripted.save(os.path.join(output_dir, "model.pt"))
 
 """
 torch.onnx.export(
