@@ -14,6 +14,8 @@ docker run --rm --gpus all \
 
 ## Individual Models Setup
 
+Setup of the individual models available in the system are documented below.
+
 ### Indentity Model Setup
 
 #### 1. Generate torchscript model
@@ -29,8 +31,16 @@ docker run --rm --gpus all --shm-size=900g \
 
 #### 2. Run inference example
 
+You might want to run the latest version of the container:
+
 ```bash
-docker run --rm --gpus all --shm-size=900g \
+docker pull nasanccs/hyperself:latest
+```
+
+Proceed to run inference:
+
+```bash
+docker run --rm --gpus all --shm-size=900g --network=host \
   -v /home/jacaraba:/home/jacaraba \
   -v /raid/jacaraba:/raid/jacaraba \
   -v /raid/ilab:/raid/ilab \
