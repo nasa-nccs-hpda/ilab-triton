@@ -38,10 +38,16 @@ config_output_path = os.path.join(
     output_dir, "mim_pretrain_swinv2_satvision_giant_128_window08_50ep.yaml")
 
 # download request execution
-urllib.request.urlretrieve(model_url, model_output_path)
-print(f"Downloaded to {model_output_path}")
-urllib.request.urlretrieve(config_url, config_output_path)
-print(f"Downloaded to {config_output_path}")
+if not os.path.exists(model_output_path):
+    urllib.request.urlretrieve(model_url, model_output_path)
+    print(f"Downloaded to {model_output_path}")
+else:
+    print(f"Model {model_output_path} already exists.")
+if not os.path.exists(config_output_path):
+    urllib.request.urlretrieve(config_url, config_output_path)
+    print(f"Downloaded to {config_output_path}")
+else:
+    print(f"Config {config_output_path} already exists.")
 
 # ------------------------------------------------------------------------------------
 # 2. Load the checkpoint of the model
