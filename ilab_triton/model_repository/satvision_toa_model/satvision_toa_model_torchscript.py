@@ -172,9 +172,20 @@ for name, module in model.named_modules():
         print(f"[⚠️ MAYBE COMPILED] {name}: {module.forward}")
 
 
-scripted_encoder = torch.jit.script(model.encoder)
-scripted_encoder.save("encoder.pt")
-print("SSIIIIIIIIII")
+def find_compiled_fn(mod, prefix=''):
+    for name, child in mod.named_children():
+        full_name = f"{prefix}.{name}" if prefix else name
+        if hasattr(child, "_orig_mod"):
+            print(f"[🔥 _orig_mod FOUND] {full_name}: {type(child)}")
+        if 'compiled' in str(child.forward):
+            print(f"[⚠️ compiled forward] {full_name}: {child.forward}")
+        find_compiled_fn(child, full_name)
 
-scripted = torch.jit.script(model)
-scripted.save(os.path.join(output_dir, "model.pt"))
+find_compiled_fn(model.encoder)
+
+#scripted_encoder = torch.jit.script(model.encoder)
+#scripted_encoder.save("encoder.pt")
+#print("SSIIIIIIIIII")
+
+#scripted = torch.jit.script(model)
+#scripted.save(os.path.join(output_dir, "model.pt"))
