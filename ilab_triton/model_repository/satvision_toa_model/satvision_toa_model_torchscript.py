@@ -79,8 +79,8 @@ model = unwrap_compile(model)
 # ---------------------------------------------
 # 5. Dummy input for scripting
 # ---------------------------------------------
-dummy_input = torch.randn(1, 14, 128, 128)
-dummy_mask = torch.zeros(1, 32, 32)
+dummy_input = torch.randn(1, 14, 128, 128).cuda()
+dummy_mask = torch.zeros(1, 32, 32).cuda()
 
 # ---------------------------------------------
 # 6. Export model.encoder as TorchScript
