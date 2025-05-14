@@ -125,4 +125,4 @@ print(f"Reconstruction output: {img_recon.shape}")
 #traced.save(os.path.join(output_dir, "model.pt"))
 
 traced = torch.jit.trace(wrapped_model, (image, mask), check_trace=False)
-traced.save(os.path.join(output_dir, "model2.pt"))
+traced.save(os.path.join(output_dir, "model.pt"))
