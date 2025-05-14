@@ -64,4 +64,10 @@ docker run --rm --gpus all --shm-size=900g \
 #### 2. Run inference example
 
 ```bash
+docker run --rm --gpus all --shm-size=900g --network=host \
+  -v /home/jacaraba:/home/jacaraba \
+  -v /raid/jacaraba:/raid/jacaraba \
+  -v /raid/ilab:/raid/ilab \
+  nasanccs/hyperself:latest \
+  python /raid/ilab/ilab-triton/ilab_triton/model_repository/satvision_toa_model/satvision_toa_model_inference.py
 ```
