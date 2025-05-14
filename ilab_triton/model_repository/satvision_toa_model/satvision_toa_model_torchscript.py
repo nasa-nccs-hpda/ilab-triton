@@ -102,7 +102,7 @@ print(f"Reconstruction output: {img_recon.shape}")
 # # 4. Save the new model
 # ------------------------------------------------------------------------------------
 
-print(type(model))
+print(type(model), dir(model))
 #if hasattr(model, "_orig_mod"):
 #    model = model._orig_mod
 #if hasattr(model, "module"):
