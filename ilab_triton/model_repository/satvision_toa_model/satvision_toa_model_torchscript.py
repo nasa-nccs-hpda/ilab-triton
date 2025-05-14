@@ -72,17 +72,30 @@ print(f'Attempting to load checkpoint from {config.MODEL.PRETRAINED}')
 checkpoint = torch.load(config.MODEL.PRETRAINED)
 model.load_state_dict(checkpoint['module'])
 print('Successfully applied checkpoint')
+model.cuda()
 model.eval()
 
 # ------------------------------------------------------------------------------------
 # 3. Quick test with dummy input
 # ------------------------------------------------------------------------------------
 
-# test with a dummy input
-x = torch.randn(1, 14, 128, 128)  # match the model’s input shape
+# Use the Masked-Image-Modeling transform specific to MODIS TOA data
+transform = MimTransform(config)
+
+# dummy input
+image = torch.randn(128, 128, 14)
+image, mask = transform(image)
+image = image.unsqueeze(0).cuda(non_blocking=True)
+mask = torch.from_numpy(mask).unsqueeze(0).cuda(non_blocking=True)
+print(
+    f"Image shape: {image.shape}, Mask shape: {mask.shape}")
+
+# perform inference
 with torch.no_grad():
-    out = model(x)
-    print(out.shape)
+    z = model.encoder(image, mask)
+    img_recon = model.decoder(z)
+    loss = model(image, mask)
+print(f"Reconstruction output: {img_recon.shape}")
 
 # ------------------------------------------------------------------------------------
 # # 4. Save the new model
