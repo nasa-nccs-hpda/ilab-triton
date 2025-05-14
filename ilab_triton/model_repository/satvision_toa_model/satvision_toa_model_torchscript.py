@@ -165,6 +165,16 @@ for name, module in model.named_modules():
 import torch
 torch._dynamo.reset()
 
+for name, module in model.named_modules():
+    if hasattr(module, "_orig_mod"):
+        print(f"[🔥 COMPILED] {name}: {type(module)}")
+    elif 'compiled' in str(module.forward):
+        print(f"[⚠️ MAYBE COMPILED] {name}: {module.forward}")
+
+
+scripted_encoder = torch.jit.script(model.encoder)
+scripted_encoder.save("encoder.pt")
+print("SSIIIIIIIIII")
 
 scripted = torch.jit.script(model)
 scripted.save(os.path.join(output_dir, "model.pt"))
