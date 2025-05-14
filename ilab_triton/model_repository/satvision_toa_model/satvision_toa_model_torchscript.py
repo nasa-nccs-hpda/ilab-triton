@@ -146,6 +146,25 @@ def replace_drop_path(module):
 
 replace_drop_path(model)
 
+def recursively_unwrap_compile(module):
+    if hasattr(module, "_orig_mod"):  # torch.compile wrapper
+        print(f"Unwrapping compiled module: {module}")
+        return recursively_unwrap_compile(module._orig_mod)
+    for name, child in module.named_children():
+        unwrapped = recursively_unwrap_compile(child)
+        if unwrapped is not child:
+            setattr(module, name, unwrapped)
+    return module
+
+model = recursively_unwrap_compile(model)
+
+for name, module in model.named_modules():
+    if hasattr(module, "_orig_mod"):
+        print(f"[STILL COMPILED] {name}: {type(module)}")
+
+import torch
+torch._dynamo.reset()
+
 
 scripted = torch.jit.script(model)
 scripted.save(os.path.join(output_dir, "model.pt"))
