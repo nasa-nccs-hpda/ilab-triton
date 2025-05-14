@@ -16,6 +16,7 @@ model.load_state_dict(checkpoint['module'], strict=False)
 model.eval()
 """
 import os
+import sys
 import subprocess
 import urllib.request
 
@@ -64,7 +65,19 @@ if not os.path.exists(target_dir):
 else:
     print("Repository already exists.")
 
+# setting up the path and dependencies
+sys.path.append('satvision-toa')
+from satvision_toa.models.mim import build_mim_model
+from satvision_toa.transforms.mim_modis_toa import MimTransform
+from satvision_toa.configs.config import _C, _update_config_from_file
 
+# load model config
+config = _C.clone()
+_update_config_from_file(config, config_output_path)
+
+config.defrost()
+config.MODEL.PRETRAINED = model_output_path
+config.freeze()
 
 # 3. Quick test with dummy input
 # 4. Save the new model
