@@ -53,6 +53,12 @@ docker run --rm --gpus all --shm-size=900g --network=host \
 #### 1. Generate torchscript model
 
 ```bash
+docker run --rm --gpus all --shm-size=900g \
+  -v /home/jacaraba:/home/jacaraba \
+  -v /raid/jacaraba:/raid/jacaraba \
+  -v /raid/ilab:/raid/ilab \
+  nasanccs/hyperself:latest \
+  python /raid/ilab/ilab-triton/ilab_triton/model_repository/satvision_toa_model/satvision_toa_model_torchscript.py
 ```
 
 #### 2. Run inference example

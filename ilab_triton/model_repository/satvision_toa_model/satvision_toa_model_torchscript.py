@@ -16,18 +16,26 @@ model.load_state_dict(checkpoint['module'], strict=False)
 model.eval()
 """
 import os
+import subprocess
 import urllib.request
 
+# ------------------------------------------------------------------------------------
 # 1. Automatically download the model from huggingface
+# ------------------------------------------------------------------------------------
+
+# setuo url addresses
 model_url = "https://huggingface.co/nasa-cisto-data-science-group/" + \
     "satvision-toa-giant-patch8-window8-128/resolve/main/mp_rank_00_model_states.pt"
 config_url = "https://huggingface.co/nasa-cisto-data-science-group/" + \
-    "satvision-toa-giant-patch8-window8-128/resolve/main/mim_pretrain_swinv2_satvision_giant_128_window08_50ep.yaml"
+    "satvision-toa-giant-patch8-window8-128/resolve/main/" + \
+    "mim_pretrain_swinv2_satvision_giant_128_window08_50ep.yaml"
 
 # download the model into the filesystem
-output_dir = "/raid/ilab/ilab-triton/ilab_triton/model_repository/satvision_toa_model/1/"
-model_output_path = os.path.join(output_dir, "mp_rank_00_model_states.pt")
-config_output_path = os.path.join(output_dir, "mim_pretrain_swinv2_satvision_giant_128_window08_50ep.yaml")
+output_dir = "/raid/ilab/ilab-triton/ilab_triton/model_repository/satvision_toa_model/1"
+model_output_path = os.path.join(
+    output_dir, "mp_rank_00_model_states.pt")
+config_output_path = os.path.join(
+    output_dir, "mim_pretrain_swinv2_satvision_giant_128_window08_50ep.yaml")
 
 # download request execution
 urllib.request.urlretrieve(model_url, model_output_path)
@@ -35,8 +43,23 @@ print(f"Downloaded to {model_output_path}")
 urllib.request.urlretrieve(config_url, config_output_path)
 print(f"Downloaded to {config_output_path}")
 
-
+# ------------------------------------------------------------------------------------
 # 2. Load the checkpoint of the model
+# ------------------------------------------------------------------------------------
+
+# download satvision-toa repo dependencies
+repo_url = "https://github.com/nasa-nccs-hpda/satvision-toa"
+target_dir = "/raid/ilab/ilab-triton/ilab_triton/model_repository/" + \
+    "satvision_toa_model/satvision-toa"
+
+if not os.path.exists(target_dir):
+    subprocess.run(["git", "clone", repo_url, target_dir], check=True)
+    print(f"Cloned {repo_url} into {target_dir}")
+else:
+    print("Repository already exists.")
+
+
+
 # 3. Quick test with dummy input
 # 4. Save the new model
 
