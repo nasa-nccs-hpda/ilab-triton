@@ -112,21 +112,5 @@ print(type(model), dir(model))
 #traced = torch.jit.trace(model, (image, mask))
 #traced.save(os.path.join(output_dir, "model.pt"))
 
-#scripted = torch.jit.script(model)
-#scripted.save(os.path.join(output_dir, "model.pt"))
-
-"""
-torch.onnx.export(
-    model,
-    (image, mask),
-    os.path.join(output_dir, "model.onnx"),
-    input_names=["image", "mask"],
-    output_names=["output"],
-    opset_version=17,
-    dynamic_axes={
-        "image": {0: "batch_size"},
-        "mask": {0: "batch_size"},
-        "output": {0: "batch_size"},
-    }
-)
-"""
+scripted = torch.jit.script(model)
+scripted.save(os.path.join(output_dir, "model.pt"))
