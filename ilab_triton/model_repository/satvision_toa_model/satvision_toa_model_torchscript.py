@@ -56,17 +56,17 @@ else:
 
 # download satvision-toa repo dependencies
 repo_url = "https://github.com/nasa-nccs-hpda/satvision-toa"
-target_dir = "/raid/ilab/ilab-triton/ilab_triton/model_repository/" + \
+repo_target_dir = "/raid/ilab/ilab-triton/ilab_triton/model_repository/" + \
     "satvision_toa_model/satvision-toa"
 
 if not os.path.exists(target_dir):
-    subprocess.run(["git", "clone", repo_url, target_dir], check=True)
-    print(f"Cloned {repo_url} into {target_dir}")
+    subprocess.run(["git", "clone", repo_url, repo_target_dir], check=True)
+    print(f"Cloned {repo_url} into {repo_target_dir}")
 else:
     print("Repository already exists.")
 
 # setting up the path and dependencies
-sys.path.append('satvision-toa')
+sys.path.append(repo_target_dir)
 from satvision_toa.models.mim import build_mim_model
 from satvision_toa.transforms.mim_modis_toa import MimTransform
 from satvision_toa.configs.config import _C, _update_config_from_file
