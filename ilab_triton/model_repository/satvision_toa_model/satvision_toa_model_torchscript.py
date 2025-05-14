@@ -103,5 +103,5 @@ print(f"Reconstruction output: {img_recon.shape}")
 # ------------------------------------------------------------------------------------
 
 # convert to torchscript
-traced = torch.jit.trace(model, x)
+traced = torch.jit.trace(model, (image, mask))
 traced.save(os.path.join(output_dir, "model.pt"))
