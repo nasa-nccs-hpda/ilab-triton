@@ -1,22 +1,6 @@
-"""
-import torch
-from satvision_toa import SatVisionTOAModel  # your actual class
-from deepspeed.runtime.checkpoint_engine import load_torch_checkpoint
-
-# Instantiate model architecture
-model = SatVisionTOAModel()
-
-# Load the DeepSpeed checkpoint
-checkpoint = torch.load("mp_rank_00_model_states.pt", map_location="cpu")
-
-# Extract model weights
-model.load_state_dict(checkpoint['module'], strict=False)
-
-# Set to eval mode
-model.eval()
-"""
 import os
 import sys
+import torch
 import subprocess
 import urllib.request
 
@@ -78,6 +62,17 @@ _update_config_from_file(config, config_output_path)
 config.defrost()
 config.MODEL.PRETRAINED = model_output_path
 config.freeze()
+
+# load model weights from checkpoint
+print('Building un-initialized model')
+model = build_mim_model(config)
+print('Successfully built uninitialized model')
+
+print(f'Attempting to load checkpoint from {config.MODEL.PRETRAINED}')
+checkpoint = torch.load(config.MODEL.PRETRAINED)
+model.load_state_dict(checkpoint['module'])
+print('Successfully applied checkpoint')
+model.eval()
 
 # 3. Quick test with dummy input
 # 4. Save the new model
