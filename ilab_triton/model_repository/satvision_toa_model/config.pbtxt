@@ -1,19 +1,22 @@
 name: "satvision_toa_model"
-backend: "pytorch"
-max_batch_size: 8
-
+platform: "pytorch_libtorch"
+max_batch_size: 0
 input [
   {
-    name: "input"
+    name: "image"
     data_type: TYPE_FP32
     dims: [14, 128, 128]
+  },
+  {
+    name: "mask"
+    data_type: TYPE_BOOL
+    dims: [32, 32]
   }
 ]
-
 output [
   {
     name: "output"
     data_type: TYPE_FP32
-    dims: [1, 128, 128]
+    dims: [14, 128, 128]
   }
 ]
