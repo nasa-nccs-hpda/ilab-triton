@@ -4,6 +4,7 @@ import torch
 import subprocess
 import numpy as np
 import urllib.request
+import torch.nn as nn
 
 # ------------------------------------------------------------------------------------
 # 1. Automatically download the model from huggingface
@@ -74,8 +75,6 @@ print(f'Attempting to load checkpoint from {config.MODEL.PRETRAINED}')
 checkpoint = torch.load(config.MODEL.PRETRAINED)
 model.load_state_dict(checkpoint['module'])
 print('Successfully applied checkpoint')
-model.cuda()
-model.eval()
 
 # ------------------------------------------------------------------------------------
 # 3. Quick test with dummy input
@@ -83,6 +82,20 @@ model.eval()
 
 # Use the Masked-Image-Modeling transform specific to MODIS TOA data
 transform = MimTransform(config)
+
+
+class InferenceWrapper(nn.Module):
+    def __init__(self, base_model):
+        super().__init__()
+        self.base_model = base_model
+
+    def forward(self, x, mask):
+        z = self.base_model.encoder(x, mask)
+        x_rec = self.base_model.decoder(z)
+        return x_rec
+
+wrapped_model = InferenceWrapper(model)
+wrapped_model.eval().cuda()
 
 # dummy input
 image = np.random.rand(128, 128, 14).astype(np.float32)
@@ -92,16 +105,24 @@ mask = torch.from_numpy(mask).unsqueeze(0).cuda(non_blocking=True)
 print(
     f"Image shape: {image.shape}, Mask shape: {mask.shape}")
 
+"""
 # perform inference
 with torch.no_grad():
     z = model.encoder(image, mask)
     img_recon = model.decoder(z)
     loss = model(image, mask)
 print(f"Reconstruction output: {img_recon.shape}")
+"""
+with torch.no_grad():
+    img_recon = wrapped_model(image, mask)
+print(f"Reconstruction output: {img_recon.shape}")
 
 # ------------------------------------------------------------------------------------
 # # 4. Save the new model
 # ------------------------------------------------------------------------------------
 
-traced = torch.jit.trace(model, (image, mask), check_trace=False)
-traced.save(os.path.join(output_dir, "model.pt"))
+#traced = torch.jit.trace(model, (image, mask), check_trace=False)
+#traced.save(os.path.join(output_dir, "model.pt"))
+
+traced = torch.jit.trace(wrapped_model, (image, mask), check_trace=False)
+traced.save(os.path.join(output_dir, "model2.pt"))
