@@ -5,22 +5,26 @@ import tritonclient.http as httpclient
 client = httpclient.InferenceServerClient(url="localhost:8000")
 
 # Create dummy input data
-input_data = np.random.rand(14, 128, 128).astype(np.float32)
+image = np.random.rand(1, 14, 128, 128).astype(np.float32)
+mask = np.random.randint(0, 2, size=(1, 32, 32)).astype(bool)
 
-# Prepare the input tensor
-input_tensor = httpclient.InferInput("input", input_data.shape, "FP32")
-input_tensor.set_data_from_numpy(input_data)
+# Prepare input tensors
+image_tensor = httpclient.InferInput("image", image.shape, "FP32")
+image_tensor.set_data_from_numpy(image)
 
-# Specify the output tensor
+mask_tensor = httpclient.InferInput("mask", mask.shape, "BOOL")
+mask_tensor.set_data_from_numpy(mask)
+
+# Specify output tensor
 output_tensor = httpclient.InferRequestedOutput("output")
 
 # Perform inference
 response = client.infer(
     model_name="satvision_toa_model",
-    inputs=[input_tensor],
+    inputs=[image_tensor, mask_tensor],
     outputs=[output_tensor]
 )
 
-# Retrieve and print the output
-output_data = response.as_numpy("output")
-print("Output shape:", output_data.shape)
+# Retrieve and print output
+output = response.as_numpy("output")
+print("Output shape:", output.shape)
