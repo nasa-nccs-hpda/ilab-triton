@@ -84,7 +84,7 @@ model.eval()
 transform = MimTransform(config)
 
 # dummy input
-image = np.random.rand(128, 128, 14)
+image = np.random.rand(128, 128, 14).astype(np.float32)
 image, mask = transform(image)
 image = image.unsqueeze(0).cuda(non_blocking=True)
 mask = torch.from_numpy(mask).unsqueeze(0).cuda(non_blocking=True)
