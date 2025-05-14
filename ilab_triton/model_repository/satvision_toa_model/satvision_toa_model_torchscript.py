@@ -104,6 +104,8 @@ print(f"Reconstruction output: {img_recon.shape}")
 
 if hasattr(model, "_orig_mod"):
     model = model._orig_mod
+if hasattr(model, "module"):
+    model = model.module
 
 # convert to torchscript
 traced = torch.jit.trace(model, (image, mask))
