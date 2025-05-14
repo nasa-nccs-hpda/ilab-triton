@@ -113,5 +113,9 @@ print(type(model), dir(model))
 #traced = torch.jit.trace(model, (image, mask))
 #traced.save(os.path.join(output_dir, "model.pt"))
 
+for name, module in model.named_modules():
+    if "checkpoint" in str(type(module)):
+        print(f"{name}: {type(module)}")
+
 scripted = torch.jit.script(model)
 scripted.save(os.path.join(output_dir, "model.pt"))
