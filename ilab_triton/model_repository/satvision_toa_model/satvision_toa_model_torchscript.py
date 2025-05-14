@@ -117,5 +117,16 @@ for name, module in model.named_modules():
     if "checkpoint" in str(type(module)):
         print(f"{name}: {type(module)}")
 
+print(model.encoder.forward)
+
+# Remove torch.compile or any Dynamo wrapping
+if hasattr(model, "_orig_mod"):
+    print("Unwrapping compiled model...")
+    model = model._orig_mod
+
+if hasattr(model.encoder, "_orig_mod"):
+    print("Unwrapping encoder...")
+    model.encoder = model.encoder._orig_mod
+
 scripted = torch.jit.script(model)
 scripted.save(os.path.join(output_dir, "model.pt"))
