@@ -103,6 +103,11 @@ print(f"Reconstruction output: {img_recon.shape}")
 # # 4. Save the new model
 # ------------------------------------------------------------------------------------
 
+import torch
+
+torch._dynamo.reset()
+
+
 print(type(model), dir(model))
 #if hasattr(model, "_orig_mod"):
 #    model = model._orig_mod
@@ -117,7 +122,7 @@ for name, module in model.named_modules():
     if "checkpoint" in str(type(module)):
         print(f"{name}: {type(module)}")
 
-print(model.encoder.forward)
+#print(model.encoder.forward)
 
 # Remove torch.compile or any Dynamo wrapping
 if hasattr(model, "_orig_mod"):
@@ -127,6 +132,20 @@ if hasattr(model, "_orig_mod"):
 if hasattr(model.encoder, "_orig_mod"):
     print("Unwrapping encoder...")
     model.encoder = model.encoder._orig_mod
+
+from timm.models.layers import DropPath
+
+# Replace all DropPath modules with nn.Identity
+def replace_drop_path(module):
+    for name, child in module.named_children():
+        if isinstance(child, DropPath):
+            print(f"Replacing DropPath at {name}")
+            setattr(module, name, torch.nn.Identity())
+        else:
+            replace_drop_path(child)
+
+replace_drop_path(model)
+
 
 scripted = torch.jit.script(model)
 scripted.save(os.path.join(output_dir, "model.pt"))
