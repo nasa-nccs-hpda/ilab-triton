@@ -59,7 +59,7 @@ repo_url = "https://github.com/nasa-nccs-hpda/satvision-toa"
 repo_target_dir = "/raid/ilab/ilab-triton/ilab_triton/model_repository/" + \
     "satvision_toa_model/satvision-toa"
 
-if not os.path.exists(target_dir):
+if not os.path.exists(repo_target_dir):
     subprocess.run(["git", "clone", repo_url, repo_target_dir], check=True)
     print(f"Cloned {repo_url} into {repo_target_dir}")
 else:
