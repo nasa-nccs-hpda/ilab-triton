@@ -5,7 +5,7 @@ import tritonclient.http as httpclient
 client = httpclient.InferenceServerClient(url="localhost:8000")
 
 # Create dummy input data
-image = np.random.rand(14, 128, 128).astype(np.float32)
+image = np.random.rand(1, 14, 128, 128).astype(np.float32)
 mask = np.random.randint(0, 2, size=(32, 32)).astype(bool)
 
 # Prepare input tensors
