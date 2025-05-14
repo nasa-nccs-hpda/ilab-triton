@@ -62,6 +62,7 @@ _update_config_from_file(config, config_output_path)
 
 config.defrost()
 config.MODEL.PRETRAINED = model_output_path
+config.TRAIN.USE_CHECKPOINT = False
 config.freeze()
 
 # load model weights from checkpoint
