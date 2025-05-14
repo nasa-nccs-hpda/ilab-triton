@@ -108,12 +108,13 @@ if hasattr(model, "module"):
     model = model.module
 
 # convert to torchscript
-#traced = torch.jit.trace(model, (image, mask))
-#traced.save(os.path.join(output_dir, "model.pt"))
+traced = torch.jit.trace(model, (image, mask))
+traced.save(os.path.join(output_dir, "model.pt"))
 
 #scripted = torch.jit.script(model)
 #scripted.save(os.path.join(output_dir, "model.pt"))
 
+"""
 torch.onnx.export(
     model,
     (image, mask),
@@ -127,3 +128,4 @@ torch.onnx.export(
         "output": {0: "batch_size"},
     }
 )
+"""
