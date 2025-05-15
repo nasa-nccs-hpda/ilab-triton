@@ -20,3 +20,9 @@ output [
     dims: [1, 14, 128, 128]
   }
 ]
+instance_group [
+  {
+    kind: KIND_GPU
+    gpus: [ 0 ]
+  }
+]
