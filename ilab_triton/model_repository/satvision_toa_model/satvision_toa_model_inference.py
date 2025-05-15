@@ -5,7 +5,7 @@ import tritonclient.http as httpclient
 # Initialize the Triton client
 # client = httpclient.InferenceServerClient(url="https://gs6n-dgx02.sci.gsfc.nasa.gov/")
 
-url="https://gs6n-dgx02.sci.gsfc.nasa.gov"
+url="gs6n-dgx02.sci.gsfc.nasa.gov"
 ssl_context = ssl._create_unverified_context()
 
 client = httpclient.InferenceServerClient(
