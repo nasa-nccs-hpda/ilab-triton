@@ -1,6 +1,6 @@
 name: "satvision_toa_model"
 platform: "pytorch_libtorch"
-max_batch_size: 0
+max_batch_size: 32
 input [
   {
     name: "image"
