@@ -12,7 +12,8 @@ client = httpclient.InferenceServerClient(
     url=url,
     ssl=True,
     verbose=False,
-    ssl_context_factory=ssl_context
+    insecure=True
+    #ssl_context_factory=ssl_context
 )
 
 # Create dummy input data
