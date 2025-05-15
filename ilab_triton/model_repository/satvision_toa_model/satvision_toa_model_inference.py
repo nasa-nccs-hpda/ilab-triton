@@ -11,7 +11,8 @@ ssl_context = ssl._create_unverified_context()
 client = httpclient.InferenceServerClient(
     url=url,
     ssl=True,
-    verbose=False
+    verbose=False,
+    ssl_context_factory=ssl_context
 )
 
 # Create dummy input data
