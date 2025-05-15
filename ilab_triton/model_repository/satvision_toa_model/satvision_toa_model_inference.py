@@ -2,7 +2,15 @@ import numpy as np
 import tritonclient.http as httpclient
 
 # Initialize the Triton client
-client = httpclient.InferenceServerClient(url="https://gs6n-dgx02.sci.gsfc.nasa.gov")
+# client = httpclient.InferenceServerClient(url="https://gs6n-dgx02.sci.gsfc.nasa.gov/")
+
+url="https://gs6n-dgx02.sci.gsfc.nasa.gov"
+client = httpclient.InferenceServerClient(
+    url=url,
+    ssl=True,
+    # ssl_context=ssl_context,
+    verbose=False
+)
 
 # Create dummy input data
 image = np.random.rand(1, 14, 128, 128).astype(np.float32)
