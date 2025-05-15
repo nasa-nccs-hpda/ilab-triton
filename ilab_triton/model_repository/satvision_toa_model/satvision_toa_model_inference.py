@@ -1,3 +1,4 @@
+import ssl
 import numpy as np
 import tritonclient.http as httpclient
 
@@ -5,10 +6,12 @@ import tritonclient.http as httpclient
 # client = httpclient.InferenceServerClient(url="https://gs6n-dgx02.sci.gsfc.nasa.gov/")
 
 url="https://gs6n-dgx02.sci.gsfc.nasa.gov"
+ssl_context = ssl._create_unverified_context()
+
 client = httpclient.InferenceServerClient(
     url=url,
     ssl=True,
-    # ssl_context=ssl_context,
+    ssl_context=ssl_context,
     verbose=False
 )
 
