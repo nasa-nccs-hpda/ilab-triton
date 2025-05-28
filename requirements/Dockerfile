@@ -13,8 +13,10 @@ RUN ln -sf /usr/bin/python3 /usr/bin/python
 
 # Install model dependencies
 RUN pip --no-cache-dir install \
-    microsoft-aurora \
     timm \
     huggingface_hub \
-    torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-    
+    torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 \
+    git+https://github.com/microsoft/aurora.git@main \
+    git+https://github.com/nasa-nccs-hpda/satvision-toa@main
+    # satvision-toa
+    # microsoft-aurora
