@@ -5,6 +5,7 @@ import subprocess
 import numpy as np
 import urllib.request
 import torch.nn as nn
+from datetime import datetime
 
 # ------------------------------------------------------------------------------------
 # 1. Automatically download the model from huggingface
@@ -44,10 +45,10 @@ else:
 # setting up the path and dependencies
 sys.path.append(repo_target_dir)
 
-from aurora import Aurora, rollout
+from aurora import Aurora, rollout, AuroraSmall, Batch, Metadata
 
-#model = Aurora(use_lora=False)
-#model.load_checkpoint_local(model_output_path, use_lora=False)
+# model = Aurora(use_lora=False)
+# model.load_checkpoint_local(model_output_path, use_lora=False)
 model = Aurora(use_lora=False)  # The pretrained version does not use LoRA.
 model.load_checkpoint("microsoft/aurora", "aurora-0.25-pretrained.ckpt")
 model.eval().cuda()
@@ -56,3 +57,19 @@ model.eval().cuda()
 # checkpoint = torch.load(config.MODEL.PRETRAINED)
 # model.load_state_dict(checkpoint['module'])
 # print('Successfully applied checkpoint')
+
+batch = Batch(
+    surf_vars={k: torch.randn(1, 2, 17, 32) for k in ("2t", "10u", "10v", "msl")},
+    static_vars={k: torch.randn(17, 32) for k in ("lsm", "z", "slt")},
+    atmos_vars={k: torch.randn(1, 2, 4, 17, 32) for k in ("z", "u", "v", "t", "q")},
+    metadata=Metadata(
+        lat=torch.linspace(90, -90, 17),
+        lon=torch.linspace(0, 360, 32 + 1)[:-1],
+        time=(datetime(2020, 6, 1, 12, 0),),
+        atmos_levels=(100, 250, 500, 850),
+    ),
+)
+
+prediction = model.forward(batch)
+
+print(prediction.surf_vars["2t"])
