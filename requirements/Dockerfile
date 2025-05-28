@@ -17,3 +17,4 @@ RUN pip --no-cache-dir install \
     timm \
     huggingface_hub \
     torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+    
