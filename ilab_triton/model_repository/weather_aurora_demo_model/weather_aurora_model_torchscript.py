@@ -46,8 +46,10 @@ sys.path.append(repo_target_dir)
 
 from aurora import Aurora, rollout
 
-model = Aurora(use_lora=False)
-model.load_checkpoint_local(model_output_path)
+#model = Aurora(use_lora=False)
+#model.load_checkpoint_local(model_output_path, use_lora=False)
+model = Aurora(use_lora=False)  # The pretrained version does not use LoRA.
+model.load_checkpoint("microsoft/aurora", "aurora-0.25-pretrained.ckpt")
 model.eval().cuda()
 
 # print(f'Attempting to load checkpoint from {config.MODEL.PRETRAINED}')
