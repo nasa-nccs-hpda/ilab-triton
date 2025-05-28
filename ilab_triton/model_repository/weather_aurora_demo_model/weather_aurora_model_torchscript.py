@@ -21,10 +21,10 @@ model_output_path = os.path.join(
     output_dir, "aurora-0.25-finetuned.ckpt")
 
 # download request execution
-#if not os.path.exists(model_output_path):
+# if not os.path.exists(model_output_path):
 #    urllib.request.urlretrieve(model_url, model_output_path)
 #    print(f"Downloaded to {model_output_path}")
-#else:
+# else:
 #    print(f"Model {model_output_path} already exists.")
 
 # ------------------------------------------------------------------------------------
@@ -79,12 +79,8 @@ print(prediction.surf_vars.keys())
 print(prediction.static_vars.keys())
 print(prediction.atmos_vars.keys())
 
+# Script the model using torch.jit.script (preferred when using custom classes)
+scripted_model = torch.jit.script(model)
 
-"""
-        surf_vars (dict[str, :class:`torch.Tensor`]): Surface-level variables with shape
-            `(b, t, h, w)`.
-        static_vars (dict[str, :class:`torch.Tensor`]): Static variables with shape `(h, w)`.
-        atmos_vars (dict[str, :class:`torch.Tensor`]): Atmospheric variables with shape
-            `(b, t, c, h, w)`.
-        metadata (:class:`Metadata`): Metadata associated to this batch.
-"""
+# Save TorchScript model
+scripted_model.save(os.path.join(output_dir, "model.pt"))
