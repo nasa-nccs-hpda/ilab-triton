@@ -2,6 +2,32 @@
 
 ILAB Triton Server Configuration and Benchmarks
 
+## Running Inference from your Laptop
+
+### Create conda environment
+
+```bash
+# Step 1: Create the environment
+mamba create -n triton-infer-env python=3.10 \
+    numpy \
+    matplotlib \
+    notebook \
+    pip \
+    -c conda-forge
+
+# Step 2: Activate the environment
+mamba activate triton-infer-env
+
+# Step 3: Install additional packages via pip
+pip install tritonclient[http] tritonclient[grpc]
+```
+
+### Start a notebook
+
+```bash
+jupyter notebook
+```
+
 ## Serving the Triton Server
 
 ```bash
@@ -70,4 +96,17 @@ docker run --rm --gpus all --shm-size=900g --network=host \
   -v /raid/ilab:/raid/ilab \
   nasanccs/hyperself:latest \
   python /raid/ilab/ilab-triton/ilab_triton/model_repository/satvision_toa_model/satvision_toa_model_inference.py
+```
+
+### Aurora Model Setup
+
+#### 1. Generate torchscript model
+
+```bash
+docker run --rm --gpus all --shm-size=900g \
+  -v /home/jacaraba:/home/jacaraba \
+  -v /raid/jacaraba:/raid/jacaraba \
+  -v /raid/ilab:/raid/ilab \
+  nasanccs/hyperself:latest \
+  python /raid/ilab/ilab-triton/ilab_triton/model_repository/weather_aurora_demo_model/weather_aurora_model_torchscript.py
 ```
