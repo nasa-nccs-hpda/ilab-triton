@@ -1,0 +1,34 @@
+name: "weather_aurora_model"
+backend: "python"
+max_batch_size: 0
+
+input [
+  { name: "2t" data_type: TYPE_FP32 dims: [1, 2, 17, 32] },
+  { name: "10u" data_type: TYPE_FP32 dims: [1, 2, 17, 32] },
+  { name: "10v" data_type: TYPE_FP32 dims: [1, 2, 17, 32] },
+  { name: "msl" data_type: TYPE_FP32 dims: [1, 2, 17, 32] },
+
+  { name: "lsm" data_type: TYPE_FP32 dims: [17, 32] },
+  { name: "z" data_type: TYPE_FP32 dims: [17, 32] },
+  { name: "slt" data_type: TYPE_FP32 dims: [17, 32] },
+
+  { name: "z_atmos" data_type: TYPE_FP32 dims: [1, 2, 4, 17, 32] },
+  { name: "u" data_type: TYPE_FP32 dims: [1, 2, 4, 17, 32] },
+  { name: "v" data_type: TYPE_FP32 dims: [1, 2, 4, 17, 32] },
+  { name: "t" data_type: TYPE_FP32 dims: [1, 2, 4, 17, 32] },
+  { name: "q" data_type: TYPE_FP32 dims: [1, 2, 4, 17, 32] },
+
+  { name: "lat" data_type: TYPE_FP32 dims: [17] },
+  { name: "lon" data_type: TYPE_FP32 dims: [32] },
+  { name: "time" data_type: TYPE_FP32 dims: [1] },
+  { name: "atmos_levels" data_type: TYPE_FP32 dims: [4] }
+]
+output [
+  { name: "lsm" data_type: TYPE_FP32 dims: [17, 32] },
+  { name: "z" data_type: TYPE_FP32 dims: [17, 32] },
+  { name: "slt" data_type: TYPE_FP32 dims: [17, 32] },
+  # Add other outputs like surf_vars or atmos_vars as needed
+]
+instance_group [
+  { kind: KIND_GPU count: 1 }
+]
