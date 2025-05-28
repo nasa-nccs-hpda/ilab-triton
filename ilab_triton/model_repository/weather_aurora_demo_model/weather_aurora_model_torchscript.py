@@ -21,11 +21,11 @@ model_output_path = os.path.join(
     output_dir, "aurora-0.25-finetuned.ckpt")
 
 # download request execution
-if not os.path.exists(model_output_path):
-    urllib.request.urlretrieve(model_url, model_output_path)
-    print(f"Downloaded to {model_output_path}")
-else:
-    print(f"Model {model_output_path} already exists.")
+#if not os.path.exists(model_output_path):
+#    urllib.request.urlretrieve(model_url, model_output_path)
+#    print(f"Downloaded to {model_output_path}")
+#else:
+#    print(f"Model {model_output_path} already exists.")
 
 # ------------------------------------------------------------------------------------
 # 2. Load the checkpoint of the model
