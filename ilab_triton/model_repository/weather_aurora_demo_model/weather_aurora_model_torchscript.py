@@ -74,3 +74,4 @@ prediction = model.forward(batch)
 
 print(prediction.surf_vars["2t"])
 print(type(prediction))
+print(prediction)
