@@ -75,3 +75,16 @@ prediction = model.forward(batch)
 print(prediction.surf_vars["2t"])
 print(type(prediction))
 print(prediction)
+print(prediction.surf_vars.keys())
+print(prediction.static_vars.keys())
+print(prediction.atmos_vars.keys())
+
+
+"""
+        surf_vars (dict[str, :class:`torch.Tensor`]): Surface-level variables with shape
+            `(b, t, h, w)`.
+        static_vars (dict[str, :class:`torch.Tensor`]): Static variables with shape `(h, w)`.
+        atmos_vars (dict[str, :class:`torch.Tensor`]): Atmospheric variables with shape
+            `(b, t, c, h, w)`.
+        metadata (:class:`Metadata`): Metadata associated to this batch.
+"""

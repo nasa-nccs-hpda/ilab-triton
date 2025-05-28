@@ -15,8 +15,8 @@ RUN ln -sf /usr/bin/python3 /usr/bin/python
 RUN pip --no-cache-dir install \
     timm \
     huggingface_hub \
-    torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 \
+    torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
     #git+https://github.com/microsoft/aurora.git@main \
-    git+https://github.com/nasa-nccs-hpda/satvision-toa@main
+    # git+https://github.com/nasa-nccs-hpda/satvision-toa@main
     # satvision-toa
     # microsoft-aurora
