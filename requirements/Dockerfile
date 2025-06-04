@@ -21,7 +21,8 @@ RUN pip --no-cache-dir install \
     pydantic \
     xarray \
     netcdf4 \
-    azure-storage-blob
+    azure-storage-blob \
+    "jax[cuda12_local]"
 
     # --index-url https://download.pytorch.org/whl/cu121
     #git+https://github.com/microsoft/aurora.git@main \
