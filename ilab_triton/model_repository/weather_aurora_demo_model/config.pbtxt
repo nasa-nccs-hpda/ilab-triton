@@ -1,4 +1,4 @@
-name: "weather_aurora_model"
+name: "weather_aurora_demo_model"
 backend: "python"
 max_batch_size: 0
 
@@ -40,10 +40,9 @@ output [
   { name: "atmos_vars_u" data_type: TYPE_FP32 dims: [17, 32] },
   { name: "atmos_vars_v" data_type: TYPE_FP32 dims: [17, 32] },
   { name: "atmos_vars_t" data_type: TYPE_FP32 dims: [17, 32] },
-  { name: "atmos_vars_q" data_type: TYPE_FP32 dims: [17, 32] },
+  { name: "atmos_vars_q" data_type: TYPE_FP32 dims: [17, 32] }
 
-  # metadata????
 ]
 instance_group [
-  { kind: KIND_GPU count: 1 }
+  { kind: KIND_GPU }
 ]
