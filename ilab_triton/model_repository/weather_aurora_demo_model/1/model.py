@@ -4,63 +4,41 @@ import torch
 import numpy as np
 import triton_python_backend_utils as pb_utils
 from datetime import datetime
-
-# Add Aurora module to sys.path
-# sys.path.append(os.path.join(os.path.dirname(__file__), "aurora"))
-from aurora import Aurora, Batch, Metadata
+from aurora import Aurora, Batch, Metadata, rollout
 
 
 class TritonPythonModel:
     def initialize(self, args):
-
-        # define model directory
         self.model_dir = os.path.dirname(__file__)
-        self.ckpt_path = os.path.join(
-            self.model_dir, "aurora-0.25-finetuned.ckpt")
+        self.ckpt_path = os.path.join(self.model_dir, "aurora-0.25-finetuned.ckpt")
 
-        # The pretrained version does not use LoRA.
         self.model = Aurora(use_lora=False)
-        self.model.load_checkpoint(
-            "microsoft/aurora", "aurora-0.25-pretrained.ckpt")
+        self.model.load_checkpoint("microsoft/aurora", "aurora-0.25-pretrained.ckpt")
 
-        # the local function does not parse the use lora option
-        # might need to add a commit to their repo to fix this
-        # self.model.load_checkpoint_local(ckpt_path)
-        self.device = torch.device(
-            "cuda" if torch.cuda.is_available() else "cpu")
-        # self.model.cuda()
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model.to(self.device)
         self.model.eval()
 
     def execute(self, requests):
-
         responses = []
 
         for request in requests:
             def get_tensor(name, squeeze=False):
-                tensor = pb_utils.get_input_tensor_by_name(
-                    request, name).as_numpy()
-                return torch.tensor(tensor).cuda() if not squeeze else torch.tensor(tensor).squeeze(0).cuda()
+                tensor = pb_utils.get_input_tensor_by_name(request, name).as_numpy()
+                return torch.tensor(tensor, device=self.device) if not squeeze else torch.tensor(tensor, device=self.device).squeeze(0)
 
-            # Get surf vars
-            surf_vars = {
-                k: get_tensor(f"surf_vars_{k}") for k in ["2t", "10u", "10v", "msl"]}
-
-            # Get static vars
-            static_vars = {
-                k: get_tensor(f"static_vars_{k}", squeeze=True) for k in ["lsm", "z", "slt"]}
-
-            # Get atmos vars
-            atmos_vars = {
-                k: get_tensor(f"atmos_vars_{k}") for k in ["z", "u", "v", "t", "q"]}
+            # Get surf, static, atmos vars
+            surf_vars = {k: get_tensor(f"surf_vars_{k}") for k in ["2t", "10u", "10v", "msl"]}
+            static_vars = {k: get_tensor(f"static_vars_{k}", squeeze=True) for k in ["lsm", "z", "slt"]}
+            atmos_vars = {k: get_tensor(f"atmos_vars_{k}") for k in ["z", "u", "v", "t", "q"]}
 
             # Metadata
             lat = get_tensor("metadata_lat", squeeze=True)
             lon = get_tensor("metadata_lon", squeeze=True)
             time_val = get_tensor("metadata_time", squeeze=True)
             levels = get_tensor("metadata_atmos_levels", squeeze=True)
+            steps = get_tensor("metadata_steps", squeeze=True).item()
 
-            # Reproduce batch of metadata
             metadata = Metadata(
                 lat=lat,
                 lon=lon,
@@ -68,7 +46,6 @@ class TritonPythonModel:
                 atmos_levels=tuple(float(l.item()) for l in levels)
             )
 
-            # Reproduce batch of data
             batch = Batch(
                 surf_vars=surf_vars,
                 static_vars=static_vars,
@@ -76,42 +53,38 @@ class TritonPythonModel:
                 metadata=metadata
             )
 
-            # Run inference
             with torch.inference_mode():
-                prediction = self.model(batch.to(self.device))
+                preds = [pred.to("cpu") for pred in rollout(self.model, batch, steps=int(steps))]
 
-            # Prepare outputs
+            # Stack N-step output for surf and atmos
+            def stack_preds(var_group, name):
+                my_stack = torch.stack([getattr(pred, var_group)[name] for pred in preds])
+                print('stack', name, my_stack.shape)
+                return my_stack  # [N, 721, 1440]
+
+            def to_tensor(name, tensor):
+                return pb_utils.Tensor(name, tensor.numpy().astype(np.float32))
+
             out_tensors = []
-            def output_tensor(name, data):
-                arr = data.squeeze(0).cpu().numpy().astype(np.float32)
-                return pb_utils.Tensor(name, arr)
 
-            # Add all surf_vars, static_vars, atmos_vars to outputs
             for name in ["2t", "10u", "10v", "msl"]:
-                out_tensors.append(
-                    output_tensor(
-                        f"surf_vars_{name}",
-                        prediction.surf_vars[name]
-                    )
-                )
-            for name in ["lsm", "z", "slt"]:
-                out_tensors.append(output_tensor(
-                    f"static_vars_{name}", prediction.static_vars[name]))
+                out_tensors.append(to_tensor(f"surf_vars_{name}", stack_preds("surf_vars", name)))
+
             for name in ["z", "u", "v", "t", "q"]:
-                out_tensors.append(
-                    output_tensor(
-                        f"atmos_vars_{name}",
-                        prediction.atmos_vars[name]
-                    )
-                )
+                out_tensors.append(to_tensor(f"atmos_vars_{name}", stack_preds("atmos_vars", name)))
 
-            # record responses
-            responses.append(
-                pb_utils.InferenceResponse(output_tensors=out_tensors))
+            for name in ["lsm", "z", "slt"]:
+                out_tensors.append(to_tensor(f"static_vars_{name}", preds[0].static_vars[name].cpu()))
 
-            # Free any intermediate results or tensors
-            del batch
-            del prediction
+            forecast_times = np.array(
+                [pred.metadata.time[0].timestamp() for pred in preds],
+                dtype=np.float64
+            )
+
+            responses.append(pb_utils.InferenceResponse(output_tensors=out_tensors))
+
+            # cleanup
+            del preds, batch
             torch.cuda.empty_cache()
             gc.collect()
 

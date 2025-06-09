@@ -21,14 +21,15 @@ input [
   { name: "metadata_lat" data_type: TYPE_FP64 dims: [721] },
   { name: "metadata_lon" data_type: TYPE_FP64 dims: [1440] },
   { name: "metadata_time" data_type: TYPE_FP64 dims: [1] },
-  { name: "metadata_atmos_levels" data_type: TYPE_INT64 dims: [13] }
+  { name: "metadata_atmos_levels" data_type: TYPE_INT64 dims: [13] },
+  { name: "metadata_steps" data_type: TYPE_INT64 dims: [1] }
 ]
 output [
   # surf_vars
-  { name: "surf_vars_2t" data_type: TYPE_FP32 dims:  [721, 1440] },
-  { name: "surf_vars_10u" data_type: TYPE_FP32 dims: [721, 1440] },
-  { name: "surf_vars_10v" data_type: TYPE_FP32 dims: [721, 1440] },
-  { name: "surf_vars_msl" data_type: TYPE_FP32 dims: [721, 1440] },
+  { name: "surf_vars_2t" data_type: TYPE_FP32 dims:  [-1, 721, 1440] },
+  { name: "surf_vars_10u" data_type: TYPE_FP32 dims: [-1, 721, 1440] },
+  { name: "surf_vars_10v" data_type: TYPE_FP32 dims: [-1, 721, 1440] },
+  { name: "surf_vars_msl" data_type: TYPE_FP32 dims: [-1, 721, 1440] },
 
   # static_vars
   { name: "static_vars_lsm" data_type: TYPE_FP32 dims: [721, 1440] },
@@ -36,12 +37,14 @@ output [
   { name: "static_vars_slt" data_type: TYPE_FP32 dims: [721, 1440] },
 
   # atmos_vars
-  { name: "atmos_vars_z" data_type: TYPE_FP32 dims: [721, 1440] },
-  { name: "atmos_vars_u" data_type: TYPE_FP32 dims: [721, 1440] },
-  { name: "atmos_vars_v" data_type: TYPE_FP32 dims: [721, 1440] },
-  { name: "atmos_vars_t" data_type: TYPE_FP32 dims: [721, 1440] },
-  { name: "atmos_vars_q" data_type: TYPE_FP32 dims: [721, 1440] }
+  { name: "atmos_vars_z" data_type: TYPE_FP32 dims: [-1, 721, 1440] },
+  { name: "atmos_vars_u" data_type: TYPE_FP32 dims: [-1, 721, 1440] },
+  { name: "atmos_vars_v" data_type: TYPE_FP32 dims: [-1, 721, 1440] },
+  { name: "atmos_vars_t" data_type: TYPE_FP32 dims: [-1, 721, 1440] },
+  { name: "atmos_vars_q" data_type: TYPE_FP32 dims: [-1, 721, 1440] }
 
+  # metadata
+  { name: "metadata_time" data_type: TYPE_FP64 dims: [-1] }
 ]
 instance_group [
   { kind: KIND_GPU count: 1}
