@@ -32,8 +32,10 @@ jupyter notebook
 
 ```bash
 docker run --rm --gpus all \
+  --shm-size=900g \
   -p8000:8000 -p8001:8001 -p8002:8002 \
   -v /raid/ilab/ilab-triton/ilab_triton/model_repository:/models \
+  --name triton \
   nvcr.io/nvidia/tritonserver:25.04-py3 \
   tritonserver --model-repository=/models --model-control-mode=poll
 ```
@@ -42,11 +44,13 @@ Using a custom container:
 
 ```bash
 docker run --rm --gpus all \
+  --shm-size=900g \
   -p8000:8000 -p8001:8001 -p8002:8002 \
   -v /raid/ilab/ilab-triton/ilab_triton/model_repository:/models \
   -v /raid/ilab/ilab-triton/external_software:/raid/ilab/ilab-triton/external_software \
-  -e PYTHONPATH="/raid/ilab/ilab-triton/external_software" \
-  nasanccs/ilab-triton:latest \
+  -e PYTHONPATH="/raid/ilab/ilab-triton/external_software/aurora" \
+  --name ilab-triton \
+  ilab_triton_jax_torch_v2 \
   tritonserver --model-repository=/models --model-control-mode=poll
 ```
 
