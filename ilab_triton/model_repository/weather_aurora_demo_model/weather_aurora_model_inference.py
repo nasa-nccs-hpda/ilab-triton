@@ -82,6 +82,7 @@ print("atmos_levels", len(tuple(int(level) for level in atmos_vars_ds.pressure_l
 """
 # get triton tensor
 def get_triton_tensor(name, data, dtype="FP32"):
+    print(name, data.shape, dtype)
     tensor = InferInput(name, data.shape, dtype)
     tensor.set_data_from_numpy(data)
     return tensor
@@ -123,7 +124,8 @@ for name in metadata_vars:
         data = surf_vars_ds.longitude.values
     elif name == "time":
         datetime_tuple = (surf_vars_ds.valid_time.values.astype("datetime64[s]").tolist()[1],)
-        timestamps = np.array([dt.timestamp() for dt in datetime_tuple], dtype=np.float64)
+        data = np.array([dt.timestamp() for dt in datetime_tuple], dtype=np.float64)
+        print("TIME", data.shape)
         # print(surf_vars_ds.valid_time.values, datetime_tuple, timestamps, datetime.fromtimestamp(timestamps[0]))
     elif name == "atmos_levels":
         data = np.array(tuple(int(level) for level in atmos_vars_ds.pressure_level.values))
@@ -146,7 +148,7 @@ response = client.infer(model_name, inputs=inputs, outputs=outputs)
 print(response)
 
 # Print a few example outputs
-# for name in output_names:
-#    output = response.as_numpy(name)
-#    print(f"{name}: shape = {output.shape}, dtype = {output.dtype}")
+for name in output_names:
+    output = response.as_numpy(name)
+    print(f"{name}: shape = {output.shape}, dtype = {output.dtype}")
 

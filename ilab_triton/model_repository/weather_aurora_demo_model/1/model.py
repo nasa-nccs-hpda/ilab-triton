@@ -49,6 +49,20 @@ class TritonPythonModel:
             # Get atmos vars
             atmos_vars = {k: get_tensor(f"atmos_vars_{k}") for k in ["z", "u", "v", "t", "q"]}
 
+
+            # Metadata
+            lat = get_tensor("metadata_lat", squeeze=True)
+            lon = get_tensor("metadata_lon", squeeze=True)
+            time_val = get_tensor("metadata_time", squeeze=True)
+            levels = get_tensor("metadata_atmos_levels", squeeze=True)
+
+            metadata = Metadata(
+                lat=lat,
+                lon=lon,
+                time=datetime.fromtimestamp(float(time_val.item())), #(datetime.utcfromtimestamp(float(time_val.item())),),
+                atmos_levels=tuple(float(l.item()) for l in levels)
+            )
+
             # print("Received request:", request)
             # Just echo one dummy output for now
             dummy_output = pb_utils.Tensor("surf_vars_2t", np.zeros((1, 2, 721, 1440), dtype=np.float32))
