@@ -41,7 +41,7 @@ output [
   { name: "atmos_vars_u" data_type: TYPE_FP32 dims: [-1, 721, 1440] },
   { name: "atmos_vars_v" data_type: TYPE_FP32 dims: [-1, 721, 1440] },
   { name: "atmos_vars_t" data_type: TYPE_FP32 dims: [-1, 721, 1440] },
-  { name: "atmos_vars_q" data_type: TYPE_FP32 dims: [-1, 721, 1440] }
+  { name: "atmos_vars_q" data_type: TYPE_FP32 dims: [-1, 721, 1440] },
 
   # metadata
   { name: "metadata_time" data_type: TYPE_FP64 dims: [-1] }
