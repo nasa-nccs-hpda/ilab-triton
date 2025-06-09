@@ -63,6 +63,16 @@ class TritonPythonModel:
                 atmos_levels=tuple(float(l.item()) for l in levels)
             )
 
+            batch = Batch(
+                surf_vars=surf_vars,
+                static_vars=static_vars,
+                atmos_vars=atmos_vars,
+                metadata=metadata
+            )
+
+            with torch.no_grad():
+                prediction = self.model(batch)
+
             # print("Received request:", request)
             # Just echo one dummy output for now
             dummy_output = pb_utils.Tensor("surf_vars_2t", np.zeros((1, 2, 721, 1440), dtype=np.float32))
