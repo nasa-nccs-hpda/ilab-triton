@@ -86,14 +86,15 @@ class TritonPythonModel:
                 return pb_utils.Tensor(name, arr)
 
             # Add all surf_vars, static_vars, atmos_vars to outputs
-            for name in ["2t"]:#, "10u", "10v", "msl"]:
+            for name in ["2t", "10u", "10v", "msl"]:
                 out_tensors.append(
                     output_tensor(f"surf_vars_{name}", prediction.surf_vars[name]))
-            #for name in ["lsm", "z", "slt"]:
-            #    out_tensors.append(output_tensor(f"static_vars_{name}", prediction.static_vars[name]))
-            #    print('lololol')
-            #for name in ["z", "u", "v", "t", "q"]:
-            #    out_tensors.append(output_tensor(f"atmos_vars_{name}", prediction.atmos_vars[name]))
+            for name in ["lsm", "z", "slt"]:
+                out_tensors.append(output_tensor(
+                    f"static_vars_{name}", prediction.static_vars[name]))
+            for name in ["z", "u", "v", "t", "q"]:
+                out_tensors.append(
+                    output_tensor(f"atmos_vars_{name}", prediction.atmos_vars[name]))
 
             #responses.append(pb_utils.InferenceResponse(output_tensors=out_tensors))
 
