@@ -1,4 +1,5 @@
 # aurora python backend
+import gc
 import os
 import sys
 import torch
@@ -80,7 +81,6 @@ class TritonPythonModel:
             # Run inference
             with torch.no_grad():
                 prediction = self.model(batch.to(self.device))
-            # print(prediction)
 
             # Prepare outputs
             out_tensors = []
@@ -99,12 +99,13 @@ class TritonPythonModel:
                 out_tensors.append(
                     output_tensor(f"atmos_vars_{name}", prediction.atmos_vars[name]))
 
-            #responses.append(pb_utils.InferenceResponse(output_tensors=out_tensors))
-
-            # print("Received request:", request)
-            # Just echo one dummy output for now
-            # dummy_output = pb_utils.Tensor("surf_vars_2t", np.zeros((1, 2, 721, 1440), dtype=np.float32))
+            # record responses
             responses.append(pb_utils.InferenceResponse(output_tensors=out_tensors))
 
-        return responses
+            # Free any intermediate results or tensors
+            del batch
+            del prediction
+            torch.cuda.empty_cache()
+            gc.collect()
 
+        return responses
