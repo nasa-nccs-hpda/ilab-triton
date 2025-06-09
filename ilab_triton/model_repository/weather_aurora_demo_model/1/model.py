@@ -68,19 +68,22 @@ class TritonPythonModel:
             out_tensors = []
 
             for name in ["2t", "10u", "10v", "msl"]:
-                out_tensors.append(to_tensor(f"surf_vars_{name}", stack_preds("surf_vars", name)))
+                out_tensors.append(
+                    to_tensor(f"surf_vars_{name}", stack_preds("surf_vars", name)))
 
             for name in ["z", "u", "v", "t", "q"]:
-                out_tensors.append(to_tensor(f"atmos_vars_{name}", stack_preds("atmos_vars", name)))
+                out_tensors.append(
+                    to_tensor(f"atmos_vars_{name}", stack_preds("atmos_vars", name)))
 
             for name in ["lsm", "z", "slt"]:
-                out_tensors.append(to_tensor(f"static_vars_{name}", preds[0].static_vars[name].cpu()))
+                out_tensors.append(
+                    to_tensor(f"static_vars_{name}", preds[0].static_vars[name].cpu()))
 
             forecast_times = np.array(
                 [pred.metadata.time[0].timestamp() for pred in preds],
                 dtype=np.float64
             )
-            out_tensors.append(to_tensor(f"metadata_time", forecast_times.cpu()))
+            out_tensors.append(to_tensor("metadata_time", forecast_times))
 
             responses.append(pb_utils.InferenceResponse(output_tensors=out_tensors))
 
