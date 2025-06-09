@@ -11,7 +11,7 @@ from datetime import datetime
 from aurora import Aurora, Batch, Metadata
 
 
-class TritonPythonModel:
+class TritonAuroraModel:
     def initialize(self, args):
         self.model_dir = os.path.dirname(__file__)
         ckpt_path = os.path.join(self.model_dir, "aurora-0.25-finetuned.ckpt")
@@ -39,7 +39,10 @@ class TritonPythonModel:
                 print(tensor)
                 return torch.tensor(tensor).cuda() if not squeeze else torch.tensor(tensor).squeeze(0).cuda()
             
-            print(requests)
+            print("Received request:", request)
+            # Just echo one dummy output for now
+            dummy_output = pb_utils.Tensor("surf_vars_2t", np.zeros((1, 2, 721, 1440), dtype=np.float32))
+            responses.append(pb_utils.InferenceResponse(output_tensors=[dummy_output]))
 
             # Get surf vars
             #surf_vars = {k: get_tensor(f"surf_vars_{k}") for k in ["2t", "10u", "10v", "msl"]}
