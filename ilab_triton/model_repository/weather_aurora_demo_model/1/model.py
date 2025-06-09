@@ -27,7 +27,10 @@ class TritonPythonModel:
         # the local function does not parse the use lora option
         # might need to add a commit to their repo to fix this
         # self.model.load_checkpoint_local(ckpt_path)
-        self.model.cuda()
+        self.device = torch.device(
+            "cuda" if torch.cuda.is_available() else "cpu")
+        # self.model.cuda()
+        self.model.to(self.device)
         self.model.eval()
 
     def execute(self, requests):
@@ -76,8 +79,8 @@ class TritonPythonModel:
 
             # Run inference
             with torch.no_grad():
-                prediction = self.model(batch)
-            print(prediction)
+                prediction = self.model(batch.to(self.device))
+            # print(prediction)
 
             # Prepare outputs
             out_tensors = []
