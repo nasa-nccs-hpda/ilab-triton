@@ -1,12 +1,22 @@
 import os
+import gevent.ssl
 import numpy as np
 import xarray as xr
 from datetime import datetime
 from huggingface_hub import snapshot_download
+import tritonclient.http as httpclient
 from tritonclient.http import InferenceServerClient, InferInput, InferRequestedOutput
 
 # Connect to Triton Server
-client = InferenceServerClient("localhost:8000")
+triton_server_url = "gs6n-dgx02.sci.gsfc.nasa.gov"
+# Initialize the Triton client
+ssl_context_factory = gevent.ssl._create_unverified_context
+client = httpclient.InferenceServerClient(
+    url=triton_server_url,
+    ssl=True,
+    insecure=True,
+    ssl_context_factory=ssl_context_factory
+)
 
 # Model name (must match config.pbtxt name and model folder)
 model_name = "weather_aurora_demo_model"
