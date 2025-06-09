@@ -1,0 +1,23 @@
+name: "jax_demo_model"
+backend: "python"
+max_batch_size: 0
+input [
+  {
+    name: "INPUT"
+    data_type: TYPE_FP32
+    dims: [ -1 ]  # example: 1D vector
+  }
+]
+output [
+  {
+    name: "OUTPUT"
+    data_type: TYPE_FP32
+    dims: [ -1 ]
+  }
+]
+instance_group [
+  {
+    kind: KIND_CPU
+  }
+]
+
