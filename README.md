@@ -38,6 +38,18 @@ docker run --rm --gpus all \
   tritonserver --model-repository=/models --model-control-mode=poll
 ```
 
+Using a custom container:
+
+```bash
+docker run --rm --gpus all \
+  -p8000:8000 -p8001:8001 -p8002:8002 \
+  -v /raid/ilab/ilab-triton/ilab_triton/model_repository:/models \
+  -v /raid/ilab/ilab-triton/external_software:/raid/ilab/ilab-triton/external_software \
+  -e PYTHONPATH="/raid/ilab/ilab-triton/external_software" \
+  nasanccs/ilab-triton:latest \
+  tritonserver --model-repository=/models --model-control-mode=poll
+```
+
 ## Individual Models Setup
 
 Setup of the individual models available in the system are documented below.
@@ -109,4 +121,12 @@ docker run --rm --gpus all --shm-size=900g \
   -v /raid/ilab:/raid/ilab \
   nasanccs/hyperself:latest \
   python /raid/ilab/ilab-triton/ilab_triton/model_repository/weather_aurora_demo_model/weather_aurora_model_torchscript.py
+```
+
+## Extras
+
+### Running nvtop
+
+```bash
+docker run --rm   --gpus all   -it   nasanccs/hyperself:latest   nvtop
 ```

@@ -1,4 +1,8 @@
+import os
 import numpy as np
+import xarray as xr
+from datetime import datetime
+from huggingface_hub import snapshot_download
 from tritonclient.http import InferenceServerClient, InferInput, InferRequestedOutput
 
 # Connect to Triton Server
@@ -6,47 +10,111 @@ client = InferenceServerClient("localhost:8000")
 
 # Model name (must match config.pbtxt name and model folder)
 model_name = "weather_aurora_demo_model"
+yyyy = 2024
+mm = 12
+dd = 2
+t_stamp = f"{yyyy}-{mm:02d}-{dd:02d}"
 
-# Create dummy inputs with correct shapes and dtypes
-def create_input(name, shape):
-    if name == "metadata_lat":
-        data = np.linspace(90, -90, 17).astype(np.float32)
-    elif name == "metadata_lon":
-        data = np.linspace(0, 360, 33)[:-1].astype(np.float32)
-    #
-    else:
-        data = np.random.rand(*shape).astype(np.float32)
-    tensor = InferInput(name, data.shape, "FP32")
+# dataset url
+hf_dataset_repo_id = "nasa-cisto-data-science-group/demo-qefm"
+
+# inference data
+inference_data_dir = snapshot_download(repo_id=hf_dataset_repo_id, allow_patterns="*.nc", repo_type='dataset')
+inference_data_dir = os.path.join(inference_data_dir, 'aurora')
+print(inference_data_dir)
+
+
+# set dataset
+static_file = os.path.join(inference_data_dir, "static.nc")
+surf_file = os.path.join(inference_data_dir, f"{t_stamp}-surface-level.nc")
+atmos_file = os.path.join(inference_data_dir, f"{t_stamp}-atmospheric.nc")
+
+# read the data
+static_vars_ds = xr.open_dataset(static_file)
+surf_vars_ds = xr.open_dataset(surf_file)
+atmos_vars_ds = xr.open_dataset(atmos_file)
+
+# send the data to triton
+
+"""
+# surf vars
+print("surf vars")
+print("2t", surf_vars_ds["t2m"].values[:2][None].shape)
+print("10u", surf_vars_ds["u10"].values[:2][None].shape)
+print("10v", surf_vars_ds["v10"].values[:2][None].shape)
+print("msl", surf_vars_ds["msl"].values[:2][None].shape)
+
+# static vars
+print("static vars")
+print("z", static_vars_ds["z"].values[0].shape)
+print("slt", static_vars_ds["slt"].values[0].shape)
+print("lsm", static_vars_ds["lsm"].values[0].shape)
+
+# atmos vars
+print("atmos vars")
+print("t", atmos_vars_ds["t"].values[:2][None].shape)
+print("u", atmos_vars_ds["u"].values[:2][None].shape)
+print("v", atmos_vars_ds["v"].values[:2][None].shape)
+print("q", atmos_vars_ds["q"].values[:2][None].shape)
+print("z", atmos_vars_ds["z"].values[:2][None].shape)
+
+# metadata vars
+print("metadata vars")
+print("lat", surf_vars_ds.latitude.values.shape)
+print("lon", surf_vars_ds.longitude.values.shape)
+print("time", len((surf_vars_ds.valid_time.values.astype("datetime64[s]").tolist()[1],)))
+print("atmos_levels", len(tuple(int(level) for level in atmos_vars_ds.pressure_level.values)))
+
+"""
+# get triton tensor
+def get_triton_tensor(name, data, dtype="FP32"):
+    tensor = InferInput(name, data.shape, dtype)
     tensor.set_data_from_numpy(data)
-    print(tensor)
-    print(data)
-    return tensor, data  # return both to inspect later if needed
-
-# Define all input tensors
-input_defs = {
-    "surf_vars_2t": (1, 2, 17, 32),
-    "surf_vars_10u": (1, 2, 17, 32),
-    "surf_vars_10v": (1, 2, 17, 32),
-    "surf_vars_msl": (1, 2, 17, 32),
-    "static_vars_lsm": (17, 32),
-    "static_vars_z": (17, 32),
-    "static_vars_slt": (17, 32),
-    "atmos_vars_z": (1, 2, 4, 17, 32),
-    "atmos_vars_u": (1, 2, 4, 17, 32),
-    "atmos_vars_v": (1, 2, 4, 17, 32),
-    "atmos_vars_t": (1, 2, 4, 17, 32),
-    "atmos_vars_q": (1, 2, 4, 17, 32),
-    "metadata_lat": (17,),
-    "metadata_lon": (32,),
-    "metadata_time": (1,),
-    "metadata_atmos_levels": (4,)
-}
+    return tensor
 
 # Create input tensors
 inputs = []
-for name, shape in input_defs.items():
-    tensor, _ = create_input(name, shape)
-    print(tensor)
+
+# get surf vars
+surf_netcdf_convention = {"2t": "t2m", "10u": "u10", "10v": "v10", "msl": "msl"}
+for name in surf_netcdf_convention.keys():
+    print(surf_netcdf_convention[name], f"surf_vars_{name}")
+    data = surf_vars_ds[surf_netcdf_convention[name]].values[:2][None]
+    tensor = get_triton_tensor(f"surf_vars_{name}", data)
+    inputs.append(tensor)
+
+# get static vars
+static_vars = ["z", "slt", "lsm"]
+for name in static_vars:
+    print(name, f"static_vars_{name}")
+    data = static_vars_ds[name].values[0]
+    tensor = get_triton_tensor(f"static_vars_{name}", data)
+    inputs.append(tensor)
+
+# get atmos vars
+atmos_vars = ["t", "u", "v", "q", "z"]
+for name in atmos_vars:
+    print(name, f"atmos_vars_{name}")
+    data = atmos_vars_ds[name].values[:2][None]
+    tensor = get_triton_tensor(f"atmos_vars_{name}", data)
+    inputs.append(tensor)
+
+# metadata vars
+metadata_vars = ["lat", "lon", "time", "atmos_levels"]
+for name in metadata_vars:
+    dtype = "FP64"
+    if name == "lat":
+        data = surf_vars_ds.latitude.values
+    elif name == "lon":
+        data = surf_vars_ds.longitude.values
+    elif name == "time":
+        datetime_tuple = (surf_vars_ds.valid_time.values.astype("datetime64[s]").tolist()[1],)
+        timestamps = np.array([dt.timestamp() for dt in datetime_tuple], dtype=np.float64)
+        # print(surf_vars_ds.valid_time.values, datetime_tuple, timestamps, datetime.fromtimestamp(timestamps[0]))
+    elif name == "atmos_levels":
+        data = np.array(tuple(int(level) for level in atmos_vars_ds.pressure_level.values))
+        dtype = "INT64"
+    tensor = get_triton_tensor(f"metadata_{name}", data, dtype=dtype)
     inputs.append(tensor)
 
 # Define expected outputs
@@ -55,16 +123,13 @@ output_names = [
     "static_vars_lsm", "static_vars_z", "static_vars_slt",
     "atmos_vars_z", "atmos_vars_u", "atmos_vars_v", "atmos_vars_t", "atmos_vars_q"
 ]
-
-print(inputs)
-
 outputs = [InferRequestedOutput(name) for name in output_names]
 
 # Send inference request
 response = client.infer(model_name, inputs=inputs, outputs=outputs)
 
 # Print a few example outputs
-for name in output_names:
-    output = response.as_numpy(name)
-    print(f"{name}: shape = {output.shape}, dtype = {output.dtype}")
+# for name in output_names:
+#    output = response.as_numpy(name)
+#    print(f"{name}: shape = {output.shape}, dtype = {output.dtype}")
 
