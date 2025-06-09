@@ -80,6 +80,7 @@ class TritonPythonModel:
                 [pred.metadata.time[0].timestamp() for pred in preds],
                 dtype=np.float64
             )
+            out_tensors.append(to_tensor(f"metadata_time", forecast_times.cpu()))
 
             responses.append(pb_utils.InferenceResponse(output_tensors=out_tensors))
 
