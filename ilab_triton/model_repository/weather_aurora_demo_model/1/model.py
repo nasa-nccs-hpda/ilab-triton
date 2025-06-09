@@ -23,7 +23,7 @@ class TritonPythonModel:
         self.model = Aurora(use_lora=False)
         self.model.load_checkpoint(
             "microsoft/aurora", "aurora-0.25-pretrained.ckpt")
-        
+
         # the local function does not parse the use lora option
         # might need to add a commit to their repo to fix this
         # self.model.load_checkpoint_local(ckpt_path)
@@ -41,28 +41,32 @@ class TritonPythonModel:
                 return torch.tensor(tensor).cuda() if not squeeze else torch.tensor(tensor).squeeze(0).cuda()
 
             # Get surf vars
-            surf_vars = {k: get_tensor(f"surf_vars_{k}") for k in ["2t", "10u", "10v", "msl"]}
+            surf_vars = {
+                k: get_tensor(f"surf_vars_{k}") for k in ["2t", "10u", "10v", "msl"]}
 
             # Get static vars
-            static_vars = {k: get_tensor(f"static_vars_{k}", squeeze=True) for k in ["lsm", "z", "slt"]}
+            static_vars = {
+                k: get_tensor(f"static_vars_{k}", squeeze=True) for k in ["lsm", "z", "slt"]}
 
             # Get atmos vars
-            atmos_vars = {k: get_tensor(f"atmos_vars_{k}") for k in ["z", "u", "v", "t", "q"]}
+            atmos_vars = {
+                k: get_tensor(f"atmos_vars_{k}") for k in ["z", "u", "v", "t", "q"]}
 
             # Metadata
             lat = get_tensor("metadata_lat", squeeze=True)
             lon = get_tensor("metadata_lon", squeeze=True)
             time_val = get_tensor("metadata_time", squeeze=True)
             levels = get_tensor("metadata_atmos_levels", squeeze=True)
-            # print(lat.shape, lon.shape, )
 
+            # Reproduce batch of metadata
             metadata = Metadata(
                 lat=lat,
                 lon=lon,
-                time=(datetime.fromtimestamp(float(time_val.item())),), #(datetime.utcfromtimestamp(float(time_val.item())),),
+                time=(datetime.fromtimestamp(float(time_val.item())),),
                 atmos_levels=tuple(float(l.item()) for l in levels)
             )
 
+            # Reproduce batch of data
             batch = Batch(
                 surf_vars=surf_vars,
                 static_vars=static_vars,
@@ -70,14 +74,33 @@ class TritonPythonModel:
                 metadata=metadata
             )
 
+            # Run inference
             with torch.no_grad():
                 prediction = self.model(batch)
             print(prediction)
 
+            # Prepare outputs
+            out_tensors = []
+            def output_tensor(name, data):
+                arr = data.squeeze(0).cpu().numpy().astype(np.float32)
+                return pb_utils.Tensor(name, arr)
+
+            # Add all surf_vars, static_vars, atmos_vars to outputs
+            for name in ["2t"]:#, "10u", "10v", "msl"]:
+                out_tensors.append(
+                    output_tensor(f"surf_vars_{name}", prediction.surf_vars[name]))
+            #for name in ["lsm", "z", "slt"]:
+            #    out_tensors.append(output_tensor(f"static_vars_{name}", prediction.static_vars[name]))
+            #    print('lololol')
+            #for name in ["z", "u", "v", "t", "q"]:
+            #    out_tensors.append(output_tensor(f"atmos_vars_{name}", prediction.atmos_vars[name]))
+
+            #responses.append(pb_utils.InferenceResponse(output_tensors=out_tensors))
+
             # print("Received request:", request)
             # Just echo one dummy output for now
-            dummy_output = pb_utils.Tensor("surf_vars_2t", np.zeros((1, 2, 721, 1440), dtype=np.float32))
-            responses.append(pb_utils.InferenceResponse(output_tensors=[dummy_output]))
+            # dummy_output = pb_utils.Tensor("surf_vars_2t", np.zeros((1, 2, 721, 1440), dtype=np.float32))
+            responses.append(pb_utils.InferenceResponse(output_tensors=out_tensors))
 
         return responses
 

@@ -25,8 +25,7 @@ input [
 ]
 output [
   # surf_vars
-  { name: "surf_vars_2t" data_type: TYPE_FP32 dims:   [1, 2, 721, 1440] }
-  #{ name: "surf_vars_2t" data_type: TYPE_FP32 dims:  [721, 1440] }
+  { name: "surf_vars_2t" data_type: TYPE_FP32 dims:  [721, 1440] }
   #{ name: "surf_vars_10u" data_type: TYPE_FP32 dims: [721, 1440] },
   #{ name: "surf_vars_10v" data_type: TYPE_FP32 dims: [721, 1440] },
   #{ name: "surf_vars_msl" data_type: TYPE_FP32 dims: [721, 1440] },
