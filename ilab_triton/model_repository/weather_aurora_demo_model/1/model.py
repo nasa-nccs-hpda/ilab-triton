@@ -23,8 +23,8 @@ class TritonPythonModel:
         # self.model.eval().cuda()
         self.model = Aurora(use_lora=False)  # The pretrained version does not use LoRA.
         self.model.load_checkpoint("microsoft/aurora", "aurora-0.25-pretrained.ckpt")
-        #self.model.to(torch.device("cuda:1"))
-        self.model.cuda.eval()
+        self.model.cuda()
+        self.model.eval()
 
         print("LOADED MODEL TO CUDA")
 
