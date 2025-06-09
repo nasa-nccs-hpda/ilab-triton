@@ -40,7 +40,7 @@ class TritonPythonModel:
                 print(tensor)
                 return torch.tensor(tensor).cuda() if not squeeze else torch.tensor(tensor).squeeze(0).cuda()
             
-            print("Received request:", request)
+            #print("Received request:", request)
             # Just echo one dummy output for now
             dummy_output = pb_utils.Tensor("surf_vars_2t", np.zeros((1, 2, 721, 1440), dtype=np.float32))
             responses.append(pb_utils.InferenceResponse(output_tensors=[dummy_output]))
