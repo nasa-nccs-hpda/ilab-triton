@@ -10,12 +10,15 @@ from aurora import Aurora, Batch, Metadata, rollout
 class TritonPythonModel:
     def initialize(self, args):
         self.model_dir = os.path.dirname(__file__)
-        self.ckpt_path = os.path.join(self.model_dir, "aurora-0.25-finetuned.ckpt")
+        self.ckpt_path = os.path.join(
+            self.model_dir, "aurora-0.25-finetuned.ckpt")
 
         self.model = Aurora(use_lora=False)
-        self.model.load_checkpoint("microsoft/aurora", "aurora-0.25-pretrained.ckpt")
+        self.model.load_checkpoint(
+            "microsoft/aurora", "aurora-0.25-pretrained.ckpt")
 
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device(
+            "cuda" if torch.cuda.is_available() else "cpu")
         self.model.to(self.device)
         self.model.eval()
 
@@ -24,7 +27,8 @@ class TritonPythonModel:
 
         for request in requests:
             def get_tensor(name, squeeze=False):
-                tensor = pb_utils.get_input_tensor_by_name(request, name).as_numpy()
+                tensor = pb_utils.get_input_tensor_by_name(
+                    request, name).as_numpy()
                 return torch.tensor(tensor, device=self.device) if not squeeze else torch.tensor(tensor, device=self.device).squeeze(0)
 
             # Get surf, static, atmos vars
@@ -58,8 +62,8 @@ class TritonPythonModel:
 
             # Stack N-step output for surf and atmos
             def stack_preds(var_group, name):
-                my_stack = torch.stack([getattr(pred, var_group)[name] for pred in preds])
-                print('stack', name, my_stack.shape)
+                my_stack = torch.stack(
+                    [getattr(pred, var_group)[name] for pred in preds])
                 return my_stack  # [N, 721, 1440]
 
             def to_tensor(name, tensor):
@@ -69,23 +73,33 @@ class TritonPythonModel:
 
             for name in ["2t", "10u", "10v", "msl"]:
                 out_tensors.append(
-                    to_tensor(f"surf_vars_{name}", stack_preds("surf_vars", name)))
+                    to_tensor(
+                        f"surf_vars_{name}", stack_preds("surf_vars", name)))
 
             for name in ["z", "u", "v", "t", "q"]:
                 out_tensors.append(
-                    to_tensor(f"atmos_vars_{name}", stack_preds("atmos_vars", name)))
+                    to_tensor(
+                        f"atmos_vars_{name}", stack_preds("atmos_vars", name)))
 
             for name in ["lsm", "z", "slt"]:
                 out_tensors.append(
-                    to_tensor(f"static_vars_{name}", preds[0].static_vars[name].cpu()))
+                    to_tensor(
+                        f"static_vars_{name}",
+                        preds[0].static_vars[name].cpu())
+                )
 
             forecast_times = np.array(
                 [pred.metadata.time[0].timestamp() for pred in preds],
                 dtype=np.float64
             )
-            out_tensors.append(pb_utils.Tensor("metadata_time", forecast_times.astype(np.float64)))
+            out_tensors.append(
+                pb_utils.Tensor(
+                    "metadata_time",
+                    forecast_times.astype(np.float64))
+            )
 
-            responses.append(pb_utils.InferenceResponse(output_tensors=out_tensors))
+            responses.append(
+                pb_utils.InferenceResponse(output_tensors=out_tensors))
 
             # cleanup
             del preds, batch

@@ -47,5 +47,5 @@ output [
   { name: "metadata_time" data_type: TYPE_FP64 dims: [-1] }
 ]
 instance_group [
-  { kind: KIND_GPU count: 1}
+  { kind: KIND_GPU }
 ]
