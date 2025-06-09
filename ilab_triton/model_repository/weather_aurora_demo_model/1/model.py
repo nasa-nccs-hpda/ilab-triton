@@ -16,7 +16,7 @@ class TritonPythonModel:
         self.model_dir = os.path.dirname(__file__)
         ckpt_path = os.path.join(self.model_dir, "aurora-0.25-finetuned.ckpt")
 
-        print("LOADED MODEL")
+        print("LOADED MODEL", ckpt_path)
 
         # self.model = Aurora(use_lora=False)
         # self.model.load_checkpoint_local(ckpt_path, use_lora=False)
