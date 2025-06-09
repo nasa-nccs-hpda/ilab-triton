@@ -22,8 +22,8 @@ class TritonPythonModel:
         # self.model.load_checkpoint_local(ckpt_path, use_lora=False)
         # self.model.eval().cuda()
         self.model = Aurora(use_lora=False)  # The pretrained version does not use LoRA.
-        # self.model.load_checkpoint("microsoft/aurora", "aurora-0.25-pretrained.ckpt")
-        self.model.load_checkpoint_local(ckpt_path)
+        self.model.load_checkpoint("microsoft/aurora", "aurora-0.25-pretrained.ckpt")
+        # self.model.load_checkpoint_local(ckpt_path)
         self.model.cuda()
         self.model.eval()
 
