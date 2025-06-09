@@ -132,15 +132,15 @@ for name in metadata_vars:
         dtype = "INT64"
     tensor = get_triton_tensor(f"metadata_{name}", data, dtype=dtype)
     inputs.append(tensor)
-"""
+
 # Define expected outputs
 output_names = [
     "surf_vars_2t", "surf_vars_10u", "surf_vars_10v", "surf_vars_msl",
     "static_vars_lsm", "static_vars_z", "static_vars_slt",
     "atmos_vars_z", "atmos_vars_u", "atmos_vars_v", "atmos_vars_t", "atmos_vars_q"
 ]
-"""
-output_names = ["surf_vars_2t"]
+
+#output_names = ["surf_vars_2t"]
 outputs = [InferRequestedOutput(name) for name in output_names]
 
 # Send inference request
