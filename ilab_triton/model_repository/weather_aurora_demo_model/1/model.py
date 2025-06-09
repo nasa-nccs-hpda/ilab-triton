@@ -1,7 +1,5 @@
-# aurora python backend
 import gc
 import os
-import sys
 import torch
 import numpy as np
 import triton_python_backend_utils as pb_utils
@@ -79,7 +77,7 @@ class TritonPythonModel:
             )
 
             # Run inference
-            with torch.no_grad():
+            with torch.inference_mode():
                 prediction = self.model(batch.to(self.device))
 
             # Prepare outputs
@@ -91,16 +89,25 @@ class TritonPythonModel:
             # Add all surf_vars, static_vars, atmos_vars to outputs
             for name in ["2t", "10u", "10v", "msl"]:
                 out_tensors.append(
-                    output_tensor(f"surf_vars_{name}", prediction.surf_vars[name]))
+                    output_tensor(
+                        f"surf_vars_{name}",
+                        prediction.surf_vars[name]
+                    )
+                )
             for name in ["lsm", "z", "slt"]:
                 out_tensors.append(output_tensor(
                     f"static_vars_{name}", prediction.static_vars[name]))
             for name in ["z", "u", "v", "t", "q"]:
                 out_tensors.append(
-                    output_tensor(f"atmos_vars_{name}", prediction.atmos_vars[name]))
+                    output_tensor(
+                        f"atmos_vars_{name}",
+                        prediction.atmos_vars[name]
+                    )
+                )
 
             # record responses
-            responses.append(pb_utils.InferenceResponse(output_tensors=out_tensors))
+            responses.append(
+                pb_utils.InferenceResponse(output_tensors=out_tensors))
 
             # Free any intermediate results or tensors
             del batch
