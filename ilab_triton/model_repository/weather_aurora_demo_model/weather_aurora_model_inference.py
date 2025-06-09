@@ -7,6 +7,7 @@ from huggingface_hub import snapshot_download
 import tritonclient.http as httpclient
 from tritonclient.http import InferenceServerClient, InferInput, InferRequestedOutput
 
+"""
 # Connect to Triton Server
 triton_server_url = "gs6n-dgx02.sci.gsfc.nasa.gov"
 # Initialize the Triton client
@@ -17,6 +18,9 @@ client = httpclient.InferenceServerClient(
     insecure=True,
     ssl_context_factory=ssl_context_factory
 )
+"""
+client = httpclient.InferenceServerClient(url="gs6n-dgx02.sci.gsfc.nasa.gov:8000")
+
 
 # Model name (must match config.pbtxt name and model folder)
 model_name = "weather_aurora_demo_model"
@@ -93,7 +97,6 @@ for name in surf_netcdf_convention.keys():
     tensor = get_triton_tensor(f"surf_vars_{name}", data)
     inputs.append(tensor)
 
-"""
 # get static vars
 static_vars = ["z", "slt", "lsm"]
 for name in static_vars:
@@ -127,7 +130,7 @@ for name in metadata_vars:
         dtype = "INT64"
     tensor = get_triton_tensor(f"metadata_{name}", data, dtype=dtype)
     inputs.append(tensor)
-
+"""
 # Define expected outputs
 output_names = [
     "surf_vars_2t", "surf_vars_10u", "surf_vars_10v", "surf_vars_msl",
@@ -140,6 +143,7 @@ outputs = [InferRequestedOutput(name) for name in output_names]
 
 # Send inference request
 response = client.infer(model_name, inputs=inputs, outputs=outputs)
+print(response)
 
 # Print a few example outputs
 # for name in output_names:
