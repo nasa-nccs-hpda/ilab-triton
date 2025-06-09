@@ -11,7 +11,7 @@ from datetime import datetime
 from aurora import Aurora, Batch, Metadata
 
 
-class TritonAuroraModel:
+class TritonPythonModel:
     def initialize(self, args):
         self.model_dir = os.path.dirname(__file__)
         ckpt_path = os.path.join(self.model_dir, "aurora-0.25-finetuned.ckpt")
