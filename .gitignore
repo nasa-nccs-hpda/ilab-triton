@@ -6,6 +6,7 @@ __pycache__/
 .DS_Store
 *.yaml
 *.npz
+*.nc
 
 
 # C extensions
