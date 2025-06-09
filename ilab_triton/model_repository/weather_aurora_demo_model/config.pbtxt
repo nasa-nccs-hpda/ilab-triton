@@ -25,22 +25,22 @@ input [
 ]
 output [
   # surf_vars
-  { name: "surf_vars_2t" data_type: TYPE_FP32 dims:  [721, 1440] }
-  #{ name: "surf_vars_10u" data_type: TYPE_FP32 dims: [721, 1440] },
-  #{ name: "surf_vars_10v" data_type: TYPE_FP32 dims: [721, 1440] },
-  #{ name: "surf_vars_msl" data_type: TYPE_FP32 dims: [721, 1440] },
+  { name: "surf_vars_2t" data_type: TYPE_FP32 dims:  [721, 1440] },
+  { name: "surf_vars_10u" data_type: TYPE_FP32 dims: [721, 1440] },
+  { name: "surf_vars_10v" data_type: TYPE_FP32 dims: [721, 1440] },
+  { name: "surf_vars_msl" data_type: TYPE_FP32 dims: [721, 1440] },
 
   # static_vars
-  #{ name: "static_vars_lsm" data_type: TYPE_FP32 dims: [721, 1440] },
-  #{ name: "static_vars_z" data_type: TYPE_FP32 dims:   [721, 1440] },
-  #{ name: "static_vars_slt" data_type: TYPE_FP32 dims: [721, 1440] },
+  { name: "static_vars_lsm" data_type: TYPE_FP32 dims: [721, 1440] },
+  { name: "static_vars_z" data_type: TYPE_FP32 dims:   [721, 1440] },
+  { name: "static_vars_slt" data_type: TYPE_FP32 dims: [721, 1440] },
 
   # atmos_vars
-  #{ name: "atmos_vars_z" data_type: TYPE_FP32 dims: [721, 1440] },
-  #{ name: "atmos_vars_u" data_type: TYPE_FP32 dims: [721, 1440] },
-  #{ name: "atmos_vars_v" data_type: TYPE_FP32 dims: [721, 1440] },
-  #{ name: "atmos_vars_t" data_type: TYPE_FP32 dims: [721, 1440] },
-  #{ name: "atmos_vars_q" data_type: TYPE_FP32 dims: [721, 1440] }
+  { name: "atmos_vars_z" data_type: TYPE_FP32 dims: [721, 1440] },
+  { name: "atmos_vars_u" data_type: TYPE_FP32 dims: [721, 1440] },
+  { name: "atmos_vars_v" data_type: TYPE_FP32 dims: [721, 1440] },
+  { name: "atmos_vars_t" data_type: TYPE_FP32 dims: [721, 1440] },
+  { name: "atmos_vars_q" data_type: TYPE_FP32 dims: [721, 1440] }
 
 ]
 instance_group [
