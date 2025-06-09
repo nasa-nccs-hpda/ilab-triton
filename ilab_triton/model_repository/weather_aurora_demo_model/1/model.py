@@ -16,13 +16,18 @@ class TritonPythonModel:
         self.model_dir = os.path.dirname(__file__)
         ckpt_path = os.path.join(self.model_dir, "aurora-0.25-finetuned.ckpt")
 
+        print("LOADED MODEL")
+
         # self.model = Aurora(use_lora=False)
         # self.model.load_checkpoint_local(ckpt_path, use_lora=False)
         # self.model.eval().cuda()
         self.model = Aurora(use_lora=False)  # The pretrained version does not use LoRA.
         self.model.load_checkpoint("microsoft/aurora", "aurora-0.25-pretrained.ckpt")
-        self.model.to(torch.device("cuda:1"))
-        self.model.eval()
+        #self.model.to(torch.device("cuda:1"))
+        self.model.cuda.eval()
+
+        print("LOADED MODEL TO CUDA")
+
 
     def execute(self, requests):
 
@@ -33,9 +38,11 @@ class TritonPythonModel:
                 tensor = pb_utils.get_input_tensor_by_name(request, name).as_numpy()
                 print(tensor)
                 return torch.tensor(tensor).cuda() if not squeeze else torch.tensor(tensor).squeeze(0).cuda()
+            
+            print(requests)
 
             # Get surf vars
-            surf_vars = {k: get_tensor(f"surf_vars_{k}") for k in ["2t", "10u", "10v", "msl"]}
+            #surf_vars = {k: get_tensor(f"surf_vars_{k}") for k in ["2t", "10u", "10v", "msl"]}
             # Get static vars
             #static_vars = {k: get_tensor(f"static_vars_{k}", squeeze=True) for k in ["lsm", "z", "slt"]}
             # Get atmos vars
