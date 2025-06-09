@@ -36,8 +36,8 @@ class TritonPythonModel:
 
         for request in requests:
             def get_tensor(name, squeeze=False):
-                tensor = pb_utils.get_input_tensor_by_name(request, name).as_numpy()
-                print(tensor)
+                tensor = pb_utils.get_input_tensor_by_name(
+                    request, name).as_numpy()
                 return torch.tensor(tensor).cuda() if not squeeze else torch.tensor(tensor).squeeze(0).cuda()
 
             # Get surf vars
@@ -49,12 +49,12 @@ class TritonPythonModel:
             # Get atmos vars
             atmos_vars = {k: get_tensor(f"atmos_vars_{k}") for k in ["z", "u", "v", "t", "q"]}
 
-
             # Metadata
             lat = get_tensor("metadata_lat", squeeze=True)
             lon = get_tensor("metadata_lon", squeeze=True)
             time_val = get_tensor("metadata_time", squeeze=True)
             levels = get_tensor("metadata_atmos_levels", squeeze=True)
+            # print(lat.shape, lon.shape, )
 
             metadata = Metadata(
                 lat=lat,
@@ -72,6 +72,7 @@ class TritonPythonModel:
 
             with torch.no_grad():
                 prediction = self.model(batch)
+            print(prediction)
 
             # print("Received request:", request)
             # Just echo one dummy output for now
