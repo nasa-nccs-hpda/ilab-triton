@@ -59,7 +59,7 @@ class TritonPythonModel:
             metadata = Metadata(
                 lat=lat,
                 lon=lon,
-                time=tuple(datetime.fromtimestamp(np.array(float(time_val.item())))), #(datetime.utcfromtimestamp(float(time_val.item())),),
+                time=(datetime.fromtimestamp(float(time_val.item())),), #(datetime.utcfromtimestamp(float(time_val.item())),),
                 atmos_levels=tuple(float(l.item()) for l in levels)
             )
 
