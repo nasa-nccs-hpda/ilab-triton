@@ -5,6 +5,7 @@ ILAB Triton Server Configuration and Benchmarks
 ## Running Inference from your Laptop
 
 ### Create conda environment
+Note: Windows users will have to replace \ with ^ in the command below.
 
 ```bash
 # Step 1: Create the environment
