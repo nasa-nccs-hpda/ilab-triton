@@ -48,7 +48,7 @@ docker run --rm --gpus all \
   -p8000:8000 -p8001:8001 -p8002:8002 \
   -v /raid/ilab/ilab-triton/ilab_triton/model_repository:/models \
   -v /raid/ilab/ilab-triton/external_software:/raid/ilab/ilab-triton/external_software \
-  -e PYTHONPATH="/raid/ilab/ilab-triton/external_software/aurora" \
+  -e PYTHONPATH="/raid/ilab/ilab-triton/external_software/aurora:/raid/ilab/ilab-triton/external_software/graphcast" \
   --name ilab-triton \
   ilab_triton_jax_torch_v2 \
   tritonserver --model-repository=/models --model-control-mode=poll
