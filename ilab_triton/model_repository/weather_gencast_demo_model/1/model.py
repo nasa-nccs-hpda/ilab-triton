@@ -54,6 +54,31 @@ class TritonPythonModel:
             for var_name, var in example_batch.data_vars.items():
                 print(f"{var_name} shape: {var.shape}")
 
+            # only 1AR training
+            train_itf = data_utils.extract_inputs_targets_forcings(
+                example_batch, target_lead_times=slice("12h", "12h"),
+                **dataclasses.asdict(self.task_config))
+            train_inputs, train_targets, train_forcings = train_itf
+
+            # all but 2 timeslices
+            eval_itf = data_utils.extract_inputs_targets_forcings(
+                example_batch,
+                target_lead_times=slice(
+                    "12h", f"{(example_batch.dims['time']-2)*12}h"),
+                **dataclasses.asdict(self.task_config))
+            eval_inputs, eval_targets, eval_forcings = eval_itf
+
+            # GST orig below
+            grads_fn_jitted = jax.jit(grads_fn)
+            run_forward_jitted = jax.jit(
+                lambda rng, i, t, f: run_forward.apply(
+                    self.params, self.state, rng, i, t, f)[0]
+            )
+
+            # We also produce a pmapped version for running in parallel.
+            # This trains the model over each subdataset of the input data
+            run_forward_pmap = xarray_jax.pmap(
+                run_forward_jitted, dim="sample")
             #result_ds = run_forward(ds, self.params)
             #result_np = result_ds.to_array().values.astype(np.float32)
 
