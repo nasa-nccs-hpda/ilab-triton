@@ -25,6 +25,9 @@ from saving_gencast import grads_fn, run_forward
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 
+jax.config.update("jax_platform_name", "gpu")
+jax.config.update("jax_gpu_memory_fraction", 0.5)
+
 
 class TritonPythonModel:
 
