@@ -53,10 +53,10 @@ class TritonPythonModel:
             print(f"{var_name} shape: {var.shape}")
 
         # only 1AR training
-        train_itf = data_utils.extract_inputs_targets_forcings(
-            example_batch, target_lead_times=slice("12h", "12h"),
-            **dataclasses.asdict(self.task_config))
-        train_inputs, train_targets, train_forcings = train_itf
+        #train_itf = data_utils.extract_inputs_targets_forcings(
+        #    example_batch, target_lead_times=slice("12h", "12h"),
+        #    **dataclasses.asdict(self.task_config))
+        #train_inputs, train_targets, train_forcings = train_itf
 
         # all but 2 timeslices
         eval_itf = data_utils.extract_inputs_targets_forcings(
@@ -67,7 +67,7 @@ class TritonPythonModel:
         self.eval_inputs, self.eval_targets, self.eval_forcings = eval_itf
 
         # GST orig below
-        grads_fn_jitted = jax.jit(grads_fn)
+        # grads_fn_jitted = jax.jit(grads_fn)
         run_forward_jitted = jax.jit(
             lambda rng, i, t, f: run_forward.apply(
                 self.params, self.state, rng, i, t, f)[0]
