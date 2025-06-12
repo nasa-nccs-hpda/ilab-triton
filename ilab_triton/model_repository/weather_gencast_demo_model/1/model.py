@@ -84,7 +84,7 @@ class TritonPythonModel:
         print("Targets: ", self.eval_targets.dims.mapping)
         print("Forcings:", self.eval_forcings.dims.mapping)
 
-        self.num_ensemble_members = 8
+        self.num_ensemble_members = 1
         rng = jax.random.PRNGKey(0)
 
         # We fold-in the ensemble member, this way the first N members should always
