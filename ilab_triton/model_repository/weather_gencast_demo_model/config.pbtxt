@@ -4,7 +4,7 @@ backend: "python"
 input [
   {
     name: "input_nc"
-    data_type: TYPE_BYTES
+    data_type: TYPE_STRING
     dims: [1]
   }
 ]
@@ -12,7 +12,7 @@ input [
 output [
   {
     name: "output_array"
-    data_type: TYPE_FP32
+    data_type: TYPE_STRING
     dims: [ 1 , 2, 3, 4 ]
   }
 ]

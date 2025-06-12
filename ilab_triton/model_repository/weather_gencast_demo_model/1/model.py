@@ -24,6 +24,7 @@ from saving_gencast import grads_fn, run_forward
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 
+
 class TritonPythonModel:
 
     def initialize(self, args):
@@ -31,10 +32,11 @@ class TritonPythonModel:
         with open(self.params_path, "rb") as f:
             # self.params = checkpoint.load(f, gencast.init_params())
             self.ckpt = checkpoint.load(f, gencast.CheckPoint)
-            self.params = ckpt.params
+            self.params = self.ckpt.params
             self.state = {}
             self.task_config = self.ckpt.task_config
         print("LOADED GENCAST")
+        self.dataset_path = '/raid/ilab/ilab-triton/ilab_triton/model_repository/weather_gencast_demo_model/gencast_dataset_source-era5_date-2019-03-29_res-1.0_levels-13_steps-01.nc'
 
     def execute(self, requests):
         responses = []
