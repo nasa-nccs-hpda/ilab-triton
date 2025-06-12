@@ -1,5 +1,6 @@
 # gencast_model/1/model.py
 import os
+import gc
 import numpy as np
 import xarray as xr
 import triton_python_backend_utils as pb_utils
@@ -123,4 +124,8 @@ class TritonPythonModel:
             inference_response = pb_utils.InferenceResponse(
                 output_tensors=[output_tensor])
             responses.append(inference_response)
+                        # cleanup
+            del predictions, chunked_pred, chunks, train_itf
+            gc.collect()
+            jax.clear_backends()
         return responses
