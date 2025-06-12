@@ -10,11 +10,7 @@ input [
 ]
 
 output [
-  {
-    name: "output_array"
-    data_type: TYPE_STRING
-    dims: [ 1 , 2, 3, 4 ]
-  }
+  { name: "output_array" data_type: TYPE_FP32 dims: [ 8, 1, 1, 181, 360 ] }
 ]
 
 instance_group [
