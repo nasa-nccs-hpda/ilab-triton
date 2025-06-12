@@ -79,6 +79,38 @@ class TritonPythonModel:
             # This trains the model over each subdataset of the input data
             run_forward_pmap = xarray_jax.pmap(
                 run_forward_jitted, dim="sample")
+
+            # The number of ensemble members should be a multiple of the number of devices.
+            print(f"Number of local devices {len(jax.local_devices())}")
+            print("Inputs:  ", eval_inputs.dims.mapping)
+            print("Targets: ", eval_targets.dims.mapping)
+            print("Forcings:", eval_forcings.dims.mapping)
+
+            num_ensemble_members = 8
+            rng = jax.random.PRNGKey(0)
+
+            # We fold-in the ensemble member, this way the first N members should always
+            # match across different runs which use take the same inputs, regardless of
+            # total ensemble size.
+            rngs = np.stack(
+                [jax.random.fold_in(rng, i) for i in range(num_ensemble_members)], axis=0)
+            
+            chunks = []
+
+            chunked_pred = rollout.chunked_prediction_generator_multiple_runs(
+                predictor_fn=run_forward_pmap,
+                rngs=rngs,
+                inputs=eval_inputs,
+                targets_template=eval_targets*np.nan,
+                forcings=eval_forcings,
+                num_steps_per_chunk=1,
+                num_samples=num_ensemble_members,
+                pmap_devices=jax.local_devices())
+
+            for chunk in chunked_pred:
+                chunks.append(chunk)
+                
+            predictions = xarray.combine_by_coords(chunks)
             #result_ds = run_forward(ds, self.params)
             #result_np = result_ds.to_array().values.astype(np.float32)
 
