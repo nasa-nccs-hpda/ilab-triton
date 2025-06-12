@@ -44,8 +44,8 @@ class TritonPythonModel:
     def execute(self, requests):
         responses = []
         for request in requests:
-            #nc_bytes = pb_utils.get_input_tensor_by_name(request, "input_nc").as_numpy()[0]
-            #ds = xr.open_dataset(xr.backends.NetCDF4DataStore(nc_bytes))
+            # nc_bytes = pb_utils.get_input_tensor_by_name(request, "input_nc").as_numpy()[0]
+            # ds = xr.open_dataset(xr.backends.NetCDF4DataStore(nc_bytes))
             with open(self.dataset_path, "rb") as f:
                 example_batch = xarray.load_dataset(f).compute()
 
@@ -63,6 +63,7 @@ class TritonPythonModel:
             dummy_output = np.ones((8, 1, 1, 181, 360), dtype=np.float32)
             output_tensor = pb_utils.Tensor("output_array", dummy_output)
 
-            inference_response = pb_utils.InferenceResponse(output_tensors=[output_tensor])
+            inference_response = pb_utils.InferenceResponse(
+                output_tensors=[output_tensor])
             responses.append(inference_response)
         return responses
