@@ -7,7 +7,6 @@ import triton_python_backend_utils as pb_utils
 
 from saving_gencast import run_forward
 from graphcast import checkpoint, gencast
-from jax._src.lib import xla_bridge
 
 import os
 import warnings
@@ -132,6 +131,5 @@ class TritonPythonModel:
             del predictions, chunked_pred, chunks
             gc.collect()
             jax.clear_backends()
-            xla_bridge.get_backend().runtime_client_defragment()
 
         return responses
