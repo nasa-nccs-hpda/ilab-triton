@@ -28,7 +28,9 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 class TritonPythonModel:
 
     def initialize(self, args):
-        self.params_path = "/raid/ilab/ilab-triton/ilab_triton/model_repository/weather_gencast_demo_model/1/gencast_params_GenCast_1p0deg_Mini_<2019.npz"
+        self.model_dir = os.path.dirname(__file__)
+        self.params_path = os.path.join(
+            self.model_dir, "gencast_params_GenCast_1p0deg_Mini_2019.npz")
         with open(self.params_path, "rb") as f:
             # self.params = checkpoint.load(f, gencast.init_params())
             self.ckpt = checkpoint.load(f, gencast.CheckPoint)
