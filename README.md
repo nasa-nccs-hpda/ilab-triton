@@ -5,6 +5,7 @@ ILAB Triton Server Configuration and Benchmarks
 ## Running Inference from your Laptop
 
 ### Create conda environment
+Note: Windows users will have to replace \ with ^ in the command below.
 
 ```bash
 # Step 1: Create the environment
@@ -13,6 +14,11 @@ mamba create -n triton-infer-env python=3.10 \
     matplotlib \
     notebook \
     pip \
+    gevent \
+    huggingface_hub \
+    xarray \
+    netCDF4 \
+    h5netcdf \
     -c conda-forge
 
 # Step 2: Activate the environment
